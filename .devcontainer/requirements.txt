@@ -10,3 +10,4 @@ pipenv
 pre-commit
 requests==2.31.0
 uv
+argcomplete>=1.9.4
