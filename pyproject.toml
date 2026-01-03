@@ -1,0 +1,24 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "freeagent-fin-ops"
+version = "0.1.0"
+description = "Utility for interacting with the FreeAgent via API."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.11"
+dependencies = [
+  "requests>=2.32.0",
+  "tabulate>=0.9.0",
+  "pyyaml>=6.0.1",
+]
+
+authors = [
+  { name = "Cogni AI" },
+]
+
+[project.urls]
+Homepage = "https://github.com/Cogni-AI-OU/freeagent-fin-ops"
+Repository = "https://github.com/Cogni-AI-OU/freeagent-fin-ops"

@@ -206,9 +206,8 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
-# Xero Configuration
-xero_config.yaml
-.xero_token.json
-
 # Data exports
 *.csv
+
+# Environment files
+.env
