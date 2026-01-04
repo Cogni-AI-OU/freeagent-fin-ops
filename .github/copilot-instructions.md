@@ -42,12 +42,15 @@ configuration (`FREEAGENT_*`) and supports multiple output formats (plain/csv/js
 
 ## Project Structure
 
-- `scripts/fa_cli.py`: Main CLI with auth, bank accounts/transactions, bills, invoices, reports, pagination, output
-  formats.
+- `.devcontainer/devcontainer.json`: Devcontainer setup for consistent development environment.
+- `.devcontainer/requirements.txt`: Python dependencies for the devcontainer.
 - `.env.example`: Document required env vars for auth.
-- `README.md`: Quickstart and usage examples.
 - `.github/prompts/sdk-scripts.prompt.md`: Authoring prompt for extending SDK-based scripts.
+- `.pre-commit-config.yaml`: Pre-commit hooks for formatting and linting (YAML, Markdown).
 - `pyproject.toml`: Project metadata and dependencies.
+- `README.md`: Quickstart and usage examples.
+- `scripts/fa_cli.py`: Main CLI with auth, bank accounts/transactions, bills, invoices, reports, pagination,
+  output formats.
 
 ## Common Tasks
 
@@ -84,7 +87,11 @@ Ensure the following rules are strictly followed:
 
 Formatting rules are defined in `.yamllint` (YAML) and `.markdownlint.yaml` (Markdown).
 
-Notes:
+## Agent AI Guidelines
 
-- Project utilizes Codespaces with config at `.devcontainer/devcontainer.json` and requirements at `.devcontainer/requirements.txt`.
-- GitHub Actions run pre-commit checks (`.pre-commit-config.yaml`).
+- When already inside the devcontainer, skip setting up or switching the Python environment; the container
+  image already provides the intended tooling.
+- If some functionality is missing, suggest user whether to implement it via API if possible.
+- When struggling how to achieve something, consider creating additional documentation in docs/how-to/ or
+  extending README.md with examples.
+- After complete refactoring, run pre-commit to ensure formatting and linting are correct.
