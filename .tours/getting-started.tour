@@ -1,0 +1,77 @@
+{
+  "$schema": "https://aka.ms/codetour-schema",
+  "title": "Getting Started with FreeAgent FinOps CLI",
+  "description": "A guided walkthrough of the FreeAgent FinOps CLI repository, covering OAuth2 setup, CLI usage, configuration, and development workflows.",
+  "steps": [
+    {
+      "file": "README.md",
+      "description": "## Welcome to FreeAgent FinOps CLI\n\nThis repository provides CLI helpers for interacting with the FreeAgent API, enabling you to manage bank transactions, bills, invoices, and accounting reports programmatically.\n\n**Key Features:**\n- OAuth2 authentication with token refresh\n- Bank accounts and transactions management\n- Bills and invoices operations\n- Accounting reports (balance sheet, profit & loss)\n- Multiple output formats (plain, CSV, JSON, YAML)\n- Rate limiting and error handling\n\n**Target Users:** Developers, finance teams, and automation engineers working with FreeAgent data.",
+      "line": 1,
+      "title": "Repository Overview"
+    },
+    {
+      "file": "scripts/fa_cli.py",
+      "description": "## Main CLI Script\n\nThe `fa_cli.py` script is the heart of this project. It's a Python 3.11+ script using `uv` for dependency management.\n\n**Key Components:**\n- OAuth2 authorization code flow\n- Token refresh on 401 responses\n- Rate limit handling with backoff (429 responses)\n- Pagination support with configurable page size\n- Multiple output formats\n\n**Script Headers:** Notice the `uv` script header at the top which defines dependencies inline.",
+      "line": 1,
+      "title": "Main CLI Script"
+    },
+    {
+      "file": ".env.example",
+      "description": "## Environment Configuration\n\nThe CLI uses environment variables for configuration. Copy this file to `.env` and configure your OAuth credentials.\n\n**Required Variables:**\n- `FREEAGENT_OAUTH_ID`: Your OAuth application ID\n- `FREEAGENT_OAUTH_SECRET`: Your OAuth application secret\n- `FREEAGENT_OAUTH_REDIRECT_URI`: Must match your OAuth app settings\n- `FREEAGENT_SCOPE`: OAuth scopes (typically empty for full access)\n\n**Security:** Never commit your `.env` file — it's in `.gitignore`.",
+      "line": 1,
+      "title": "Environment Setup"
+    },
+    {
+      "file": ".pre-commit-config.yaml",
+      "description": "## Pre-commit Hooks\n\nAutomated checks run before commits to ensure code quality.\n\n**Key Hooks:**\n- **yamllint**: YAML syntax and style\n- **markdownlint**: Markdown formatting\n- **black**: Python code formatting\n- **flake8**: Python linting\n- **codespell**: Spelling checker\n- **gitleaks**: Secret detection\n- **actionlint**: GitHub Actions validation\n\n**Usage:** Run `pre-commit run -a` to check all files locally.",
+      "line": 1,
+      "title": "Pre-commit Configuration"
+    },
+    {
+      "file": ".github/workflows/check.yml",
+      "description": "## GitHub Actions Workflows\n\nThis repository uses reusable workflows from the organization's `.github` repository.\n\n**Check Workflow:**\n- Runs on all pushes and pull requests\n- Executes pre-commit hooks\n- Validates GitHub Actions with actionlint\n\n**Other Workflows:**\n- `claude.yml`: AI-powered development assistance\n- `claude-review.yml`: Automated PR reviews\n- `devcontainer-ci.yml`: Container build validation\n\nAll workflows use the `workflow_call` pattern for consistency.",
+      "line": 1,
+      "title": "CI/CD Workflows"
+    },
+    {
+      "file": ".devcontainer/devcontainer.json",
+      "description": "## Development Container\n\nThe devcontainer provides a consistent development environment.\n\n**Features:**\n- Python 3.11+ with pre-commit\n- Docker-in-Docker support\n- actionlint, node, make, ripgrep\n- VS Code extensions: Copilot, CodeTour, markdownlint\n\n**Getting Started:**\n1. Open in VS Code with Remote Containers extension\n2. Container auto-installs dependencies from `requirements.txt`\n3. Pre-commit hooks are auto-installed\n\n**Post-Create:** Runs `pip install` and `pre-commit install` automatically.",
+      "line": 1,
+      "title": "Development Container"
+    },
+    {
+      "file": ".github/copilot-instructions.md",
+      "description": "## Copilot Instructions\n\nComprehensive coding standards and project-specific guidelines for GitHub Copilot and AI assistants.\n\n**Covers:**\n- Project overview and architecture\n- Python conventions (PEP 8, type hints, uv scripts)\n- OAuth2 flow and API interactions\n- Error handling and rate limiting\n- Output formatting standards\n- Testing and validation\n\n**For Contributors:** This file helps AI assistants understand project conventions and write code that matches the existing style.",
+      "line": 1,
+      "title": "Copilot Instructions"
+    },
+    {
+      "file": "AGENTS.md",
+      "description": "## AI Agent Guidance\n\nQuick reference for AI agents working in this repository.\n\n**Contents:**\n- Quick start instructions\n- Common tasks (linting, testing, CLI usage)\n- References to specialized agents\n- Environment setup\n- Troubleshooting tips\n\n**Specialized Agents:**\n- Code Tour Expert (`.github/agents/code-tour.agent.md`)\n- Copilot Plus (`.github/agents/copilot-plus.agent.md`)\n\nThis file provides a streamlined entry point for AI-assisted development.",
+      "line": 1,
+      "title": "Agent Guidance"
+    },
+    {
+      "file": ".github/agents/code-tour.agent.md",
+      "description": "## Custom Agents\n\nCustom agent configurations for specialized tasks.\n\n**Code Tour Agent:**\n- Creates and updates VS Code CodeTour files\n- Follows CodeTour schema and best practices\n- Provides guided walkthroughs for new contributors\n\n**Usage:** Reference this agent when creating or updating tours:\n\"Use the Code Tour Expert agent to create a getting-started tour\"\n\n**Location:** Custom agents are stored in `.github/agents/` and can be referenced by name.",
+      "line": 1,
+      "title": "Custom Agents"
+    },
+    {
+      "file": ".github/instructions/markdown.instructions.md",
+      "description": "## Language-Specific Instructions\n\nDetailed formatting rules for different file types.\n\n**Available Instructions:**\n- `markdown.instructions.md`: Markdown content rules\n- `yaml.instructions.md`: YAML formatting standards\n- `json.instructions.md`: JSON formatting standards\n- `readme.instructions.md`: README-specific guidelines\n\n**Enforcement:** These rules are validated by linters in pre-commit hooks.\n\n**Markdown Rules:**\n- 120 char line length\n- H1-H3 headings only\n- Fenced code blocks with language\n- Reference-style links for repeated URLs",
+      "line": 1,
+      "title": "Formatting Instructions"
+    },
+    {
+      "file": "pyproject.toml",
+      "description": "## Project Configuration\n\nPython project metadata and dependencies.\n\n**Key Sections:**\n- Project name, version, description\n- Python version requirements (>=3.11)\n- Dependencies (typically managed in script headers)\n- Build system configuration\n\n**Note:** This project uses `uv` script headers for dependency management, so most dependencies are declared inline in the scripts rather than here.",
+      "line": 1,
+      "title": "Project Configuration"
+    },
+    {
+      "title": "Next Steps",
+      "description": "## Ready to Contribute?\n\n**To get started:**\n1. Set up your OAuth credentials in `.env`\n2. Run `./scripts/fa_cli.py auth` to authenticate\n3. Try some CLI commands to explore the API\n4. Install pre-commit hooks: `pre-commit install`\n5. Make your changes and run `pre-commit run -a` before committing\n\n**Resources:**\n- [FreeAgent API Docs](https://dev.freeagent.com/docs)\n- [Contributing Guidelines](AGENTS.md)\n- [Code Tour Documentation](.tours/README.md)\n- [Agent Documentation](.github/agents/README.md)\n\n**Questions?** Check [CLAUDE.md](CLAUDE.md) for AI assistance or open an issue on GitHub."
+    }
+  ]
+}

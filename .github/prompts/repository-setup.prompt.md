@@ -229,6 +229,14 @@ create or update it as needed with repository-specific customizations.
 
 ### Phase 5: Code Tours and Documentation
 
+- [ ] **`.tours/README.md`**
+  - Check if `.tours/` directory and file exist
+  - Reference: `https://github.com/Cogni-AI-OU/.github/blob/main/.tours/README.md`
+  - Purpose: Documentation for VS Code code tours
+  - Action: Create if missing; customize for repository-specific tours
+  - Content: What are code tours, how to use them, available tours list
+  - Customize: Update the "Available Tours" section with repository-specific tour descriptions
+
 - [ ] **`.tours/getting-started.tour`**
   - Check if `.tours/` directory and file exist
   - Reference: `https://github.com/Cogni-AI-OU/.github/blob/main/.tours/getting-started.tour`
@@ -339,6 +347,22 @@ create or update it as needed with repository-specific customizations.
   - Optional agents:
     - `copilot-plus.agent.md` - Enhanced Copilot with critical thinking
   - Customize: Add repository-specific agents as needed
+
+- [ ] **`.github/skills/` directory**
+  - Check if directory exists with skill files
+  - Reference: `https://github.com/Cogni-AI-OU/.github/tree/main/.github/skills`
+  - Purpose: Agent Skills for GitHub Copilot coding agent
+  - Action: Create directory with README.md; optionally copy skill subdirectories
+  - Required files:
+    - `README.md` - Overview of agent skills and how to use them
+  - Optional skills (copy as needed):
+    - `context-aware-ops/` - Intelligent resource management
+    - `git/` - Guide for safe git operations
+    - `github-actions/` - Debugging failing workflows
+    - `pre-commit/` - Using pre-commit hooks effectively
+    - `robust-commands/` - Resilient command execution
+    - `skill-writer/` - Generate/update SKILL.md files
+  - Customize: Add repository-specific skills as needed
 
 ### Phase 8: Additional Organization Files
 
