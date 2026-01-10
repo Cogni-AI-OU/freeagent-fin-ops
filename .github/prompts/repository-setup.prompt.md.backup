@@ -83,7 +83,6 @@ create or update it as needed with repository-specific customizations.
   - Purpose: Runs pre-commit checks and actionlint in CI
   - Action: Create using `workflow_call` to reference the remote workflow
   - Implementation:
-
     ```yaml
     ---
     name: Check
@@ -94,7 +93,6 @@ create or update it as needed with repository-specific customizations.
       check:
         uses: Cogni-AI-OU/.github/.github/workflows/check.yml@main
     ```
-
   - Customize: Add additional jobs if needed for project-specific checks
 
 - [ ] **`.github/workflows/claude.yml`**
@@ -103,7 +101,6 @@ create or update it as needed with repository-specific customizations.
   - Purpose: Claude Code automation for AI-assisted development
   - Action: Create using `workflow_call` to reference the remote workflow
   - Implementation:
-
     ```yaml
     ---
     name: Claude Code
@@ -121,7 +118,6 @@ create or update it as needed with repository-specific customizations.
         uses: Cogni-AI-OU/.github/.github/workflows/claude.yml@main
         secrets: inherit
     ```
-
   - Note: Requires `ANTHROPIC_API_KEY` secret to be set in repository settings
 
 - [ ] **`.github/workflows/claude-review.yml`**
@@ -130,7 +126,6 @@ create or update it as needed with repository-specific customizations.
   - Purpose: Automated PR review using Claude
   - Action: Create using `workflow_call` to reference the remote workflow
   - Implementation:
-
     ```yaml
     ---
     name: Claude Code Review
@@ -142,7 +137,6 @@ create or update it as needed with repository-specific customizations.
         uses: Cogni-AI-OU/.github/.github/workflows/claude-review.yml@main
         secrets: inherit
     ```
-
   - Note: Requires `ANTHROPIC_API_KEY` secret to be set in repository settings
 
 - [ ] **`.github/workflows/devcontainer-ci.yml`**
@@ -151,7 +145,6 @@ create or update it as needed with repository-specific customizations.
   - Purpose: Tests devcontainer builds and validates required tools
   - Action: Create using `workflow_call` to reference the remote workflow
   - Implementation:
-
     ```yaml
     ---
     name: Development Containers (CI)
@@ -169,7 +162,6 @@ create or update it as needed with repository-specific customizations.
       devcontainer-build:
         uses: Cogni-AI-OU/.github/.github/workflows/devcontainer-ci.yml@main
     ```
-
   - Customize: Add repository-specific required commands/packages via workflow inputs
 
 - [ ] **`.github/actionlint-matcher.json`**
@@ -183,22 +175,6 @@ create or update it as needed with repository-specific customizations.
   - Reference: `https://github.com/Cogni-AI-OU/.github/blob/main/.github/pre-commit-matcher.json`
   - Purpose: GitHub Actions problem matcher for pre-commit output
   - Action: Copy from reference if missing
-
-- [ ] **`.github/README.md`**
-  - Check if file exists
-  - Reference: `https://github.com/Cogni-AI-OU/.github/blob/main/.github/README.md`
-  - Purpose: Documentation for GitHub workflows, agents, and problem matchers
-  - Action: Copy from reference if missing; customize for repository-specific workflows
-  - Content: Workflow templates overview, agent prompts usage, problem matchers configuration, security notes
-  - Customize: Update workflow references and add repository-specific workflow documentation
-
-- [ ] **`.github/workflows/README.md`**
-  - Check if file exists
-  - Reference: `https://github.com/Cogni-AI-OU/.github/blob/main/.github/workflows/README.md`
-  - Purpose: Documentation for GitHub Actions workflows in the repository
-  - Action: Copy from reference if missing; customize for repository-specific workflows
-  - Content: Workflow descriptions, usage examples, inputs/outputs, security considerations
-  - Customize: Add documentation for any custom workflows specific to the repository
 
 ### Phase 4: Development Container Configuration
 
@@ -237,9 +213,6 @@ create or update it as needed with repository-specific customizations.
   - Content: Overview of repository structure, key files, development workflows
   - Format: JSON file following CodeTour schema
   - Note: Use the code-tour agent to create repository-specific tours
-  - Agent instructions: `https://github.com/Cogni-AI-OU/.github/blob/main/.github/agents/code-tour.agent.md`
-  - The agent should be copied to `.github/agents/code-tour.agent.md` in the repository
-  - Reference the agent when creating tours: "Use the Code Tour Expert agent to create a getting-started tour"
 
 - [ ] **Create or update repository README.md**
   - Check if `README.md` exists
@@ -328,18 +301,6 @@ create or update it as needed with repository-specific customizations.
     - `yaml.instructions.md` - YAML formatting
   - Customize: Only include files relevant to languages/formats used in repository
 
-- [ ] **`.github/agents/` directory**
-  - Check if directory exists with custom agent files
-  - Reference: `https://github.com/Cogni-AI-OU/.github/tree/main/.github/agents`
-  - Purpose: Custom agent definitions for specialized tasks
-  - Action: Copy relevant agent files based on repository needs
-  - Required agents:
-    - `code-tour.agent.md` - For creating/updating `.tours/` files (always include)
-    - `README.md` - Documentation of available agents
-  - Optional agents:
-    - `copilot-plus.agent.md` - Enhanced Copilot with critical thinking
-  - Customize: Add repository-specific agents as needed
-
 ### Phase 8: Additional Organization Files
 
 - [ ] **`CODE_OF_CONDUCT.md`**
@@ -396,7 +357,6 @@ When creating GitHub Actions workflows, use `workflow_call` to reference workflo
 - Reduced duplication
 
 Example pattern:
-
 ```yaml
 jobs:
   job-name:
@@ -443,25 +403,21 @@ This should be documented in README.md under development setup.
 ### Language-Specific Considerations
 
 #### Python Projects
-
 - Add `black`, `flake8`, `mypy` to pre-commit config
 - Include `requirements.txt` or `pyproject.toml`
 - Add Python version specification
 
 #### Node.js Projects
-
 - Add `eslint`, `prettier` to pre-commit config
 - Include `.nvmrc` for Node version
 - Add `package.json` scripts for lint/test/build
 
 #### Go Projects
-
 - Add `gofmt`, `golint` to pre-commit config
 - Include `go.mod` and `go.sum`
 - Document Go version requirements
 
 #### Java Projects
-
 - Add `checkstyle`, `spotless` configuration
 - Include Maven or Gradle configuration
 - Document Java version requirements
