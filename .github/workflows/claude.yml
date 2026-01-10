@@ -1,0 +1,23 @@
+---
+name: Claude Code
+
+on:
+  issue_comment:
+    types:
+      - created
+      - edited
+  pull_request_review_comment:
+    types:
+      - created
+      - edited
+  issues:
+    types:
+      - opened
+  pull_request_review:
+    types:
+      - submitted
+
+jobs:
+  claude:
+    uses: Cogni-AI-OU/.github/.github/workflows/claude.yml@main
+    secrets: inherit

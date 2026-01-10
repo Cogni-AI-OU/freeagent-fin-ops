@@ -1,0 +1,18 @@
+---
+name: Development Containers (CI)
+
+# yamllint disable-line rule:truthy
+on:
+  pull_request:
+    paths:
+      - .devcontainer/**
+      - .github/workflows/devcontainer-ci.yml
+  push:
+    branches:
+      - main
+    paths:
+      - .devcontainer/**
+
+jobs:
+  devcontainer-build:
+    uses: Cogni-AI-OU/.github/.github/workflows/devcontainer-ci.yml@main
