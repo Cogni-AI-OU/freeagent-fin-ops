@@ -14,6 +14,13 @@ For detailed coding standards and formatting guidelines, refer to:
 
 - [Copilot Instructions](.github/copilot-instructions.md) - Main coding standards and project overview
 
+### Specialized Agents
+
+For specific tasks, use the following specialized agent instructions:
+
+- [Code Tour Agent](.github/agents/code-tour.agent.md) - For creating/updating `.tours/` files
+- [Copilot Plus Agent](.github/agents/copilot-plus.agent.md) - Enhanced Copilot capabilities
+
 ## Common Tasks
 
 ### Before commit
