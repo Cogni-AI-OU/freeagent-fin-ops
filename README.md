@@ -1,5 +1,9 @@
 # FreeAgent FinOps CLI
 
+[![PR Reviews][pr-reviews-image]][pr-reviews-link]
+[![License][license-image]][license-link]
+[![Check Status][gha-image-check]][gha-link-check]
+
 CLI helpers for interacting with the FreeAgent API (bank transactions, bills, invoices, and accounting reports).
 
 ## Quickstart
@@ -105,3 +109,16 @@ This repository uses several GitHub Actions workflows:
 ## Contributing
 
 See [AGENTS.md](AGENTS.md) for development guidelines and [CLAUDE.md](CLAUDE.md) for AI assistance usage.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+<!-- Named links -->
+
+[pr-reviews-image]: https://img.shields.io/github/issues-pr/Cogni-AI-OU/freeagent-fin-ops?label=PR+Reviews&logo=github
+[pr-reviews-link]: https://github.com/Cogni-AI-OU/freeagent-fin-ops/pulls
+[license-image]: https://img.shields.io/badge/License-MIT-blue.svg
+[license-link]: https://tldrlegal.com/license/mit-license
+[gha-image-check]: https://github.com/Cogni-AI-OU/freeagent-fin-ops/workflows/Check/badge.svg
+[gha-link-check]: https://github.com/Cogni-AI-OU/freeagent-fin-ops/actions?query=workflow%3ACheck
