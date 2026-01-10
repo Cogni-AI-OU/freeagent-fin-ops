@@ -64,3 +64,44 @@ CLI helpers for interacting with the FreeAgent API (bank transactions, bills, in
 - You can also supply all settings via environment variables (FREEAGENT_*); `.env` is just a convenience.
 - Payroll, salary, and dividends endpoints are not available via the public FreeAgent API; related commands
   are intentionally omitted.
+
+## Development
+
+### Setup
+
+```bash
+# Install pre-commit hooks
+pip install pre-commit
+pre-commit install
+
+# Install Python dependencies (for devcontainer)
+pip install -r .devcontainer/requirements.txt
+```
+
+### Testing and Validation
+
+```bash
+# Run all pre-commit checks
+pre-commit run -a
+
+# Run specific checks
+pre-commit run markdownlint -a
+pre-commit run yamllint -a
+pre-commit run black -a
+pre-commit run flake8 -a
+```
+
+### GitHub Workflows
+
+This repository uses several GitHub Actions workflows:
+
+- **Check**: Runs pre-commit hooks and actionlint on all pushes and PRs
+- **Claude Code**: AI-powered development assistance via `@claude` mentions
+- **Claude Code Review**: Automated PR reviews using Claude
+- **DevContainer CI**: Tests devcontainer builds when devcontainer files change
+
+**Required Secrets**: Configure `ANTHROPIC_API_KEY` in repository settings for Claude workflows.
+
+## Contributing
+
+See [AGENTS.md](AGENTS.md) for development guidelines and [CLAUDE.md](CLAUDE.md) for AI assistance usage.
