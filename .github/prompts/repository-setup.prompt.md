@@ -17,6 +17,10 @@ Follow the checklist below in order to review the current repository structure a
 files. For each item, check if the file exists, compare it with the template from `.github` repository, and
 create or update it as needed with repository-specific customizations.
 
+**IMPORTANT**: Many checklist items require updating existing files, not just creating missing ones. Pay close
+attention to items marked "**REQUIRED**" or "Action: review and update" - these must be updated even if they
+exist. Do not skip items just because a file already exists.
+
 ## Checklist
 
 ### Phase 1: Essential Configuration Files
@@ -206,18 +210,17 @@ create or update it as needed with repository-specific customizations.
   - Check if `.devcontainer/` directory and file exist
   - Reference: `https://github.com/Cogni-AI-OU/.github/blob/main/.devcontainer/devcontainer.json`
   - Purpose: Defines containerized development environment
-  - Action: Create if missing; review and update if exists
+  - Action: If file exists, review and update to match organization standards; create if missing
   - Key features: Python, Docker-in-Docker, actionlint, node, make, ripgrep
-  - Customize: Add language-specific features and VS Code extensions
-  - Important: Update `postCreateCommand` and `onCreateCommand` to use repository-specific requirements
+  - Customize: Add language-specific features and VS Code extensions as needed
 
 - [ ] **`.devcontainer/requirements.txt`**
   - Check if file exists (if `.devcontainer/` exists)
   - Reference: `https://github.com/Cogni-AI-OU/.github/blob/main/.devcontainer/requirements.txt`
   - Purpose: Python dependencies for devcontainer
-  - Action: Create with base requirements; merge if exists
+  - Action: If file exists, verify it contains base packages; create with base requirements if missing
   - Base packages: ansible, ansible-lint, docker, pre-commit, uv
-  - Customize: Add project-specific Python packages
+  - Customize: Add project-specific Python packages (keep existing project packages)
 
 - [ ] **`.devcontainer/apt-packages.txt`**
   - Check if file exists (if `.devcontainer/` exists)
@@ -225,6 +228,7 @@ create or update it as needed with repository-specific customizations.
   - Purpose: System packages to install in devcontainer
   - Action: Create with base packages; merge if exists
   - Base packages: coreutils, gh, git, mawk, sed, time, vim
+  - This file must be created because devcontainer.json references it in `onCreateCommand`
   - Customize: Add project-specific system dependencies
 
 ### Phase 5: Code Tours and Documentation
@@ -355,13 +359,14 @@ create or update it as needed with repository-specific customizations.
   - Action: Create directory with README.md; optionally copy skill subdirectories
   - Required files:
     - `README.md` - Overview of agent skills and how to use them
-  - Optional skills (copy as needed):
     - `context-aware-ops/` - Intelligent resource management
     - `git/` - Guide for safe git operations
     - `github-actions/` - Debugging failing workflows
     - `pre-commit/` - Using pre-commit hooks effectively
     - `robust-commands/` - Resilient command execution
     - `skill-writer/` - Generate/update SKILL.md files
+  - Optional skills (copy as needed):
+    - Check remote
   - Customize: Add repository-specific skills as needed
 
 ### Phase 8: Additional Organization Files
@@ -384,7 +389,8 @@ create or update it as needed with repository-specific customizations.
 
 - [ ] **Validate all created/updated files**
   - Run pre-commit checks: `pre-commit run -a`
-  - Fix any linting errors found
+    In case of errors, compare `.pre-commit-config.yaml` with upstream if anything else is missing.
+    Otherwise fix any reported linting errors found
   - Ensure all YAML files are valid: `yamllint .`
   - Ensure all Markdown files are valid: `markdownlint **/*.md`
   - Ensure GitHub Actions workflows are valid: `actionlint .github/workflows/*.yml`
@@ -507,14 +513,14 @@ Follow the phases in order:
 
 A successful repository setup includes:
 
-- ✅ All essential configuration files present and valid
-- ✅ Pre-commit hooks configured and working
-- ✅ GitHub Actions workflows configured (using remote references where possible)
-- ✅ Devcontainer configured (if using containerized development)
-- ✅ Documentation updated (README, AGENTS.md, etc.)
-- ✅ All linters passing
-- ✅ Repository follows organization standards
-- ✅ Repository-specific needs addressed
+- [x] All essential configuration files present and valid
+- [x] Pre-commit hooks configured and working
+- [x] GitHub Actions workflows configured (using remote references where possible)
+- [x] Devcontainer configured (if using containerized development)
+- [x] Documentation updated (README, AGENTS.md, etc.)
+- [x] All linters passing
+- [x] Repository follows organization standards
+- [x] Repository-specific needs addressed
 
 ## Final Deliverables
 
