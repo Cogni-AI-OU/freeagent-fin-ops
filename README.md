@@ -1,5 +1,9 @@
 # FreeAgent FinOps CLI
 
+[![PR Reviews][pr-reviews-image]][pr-reviews-link]
+[![License][license-image]][license-link]
+[![Check Status][gha-image-check]][gha-link-check]
+
 CLI helpers for interacting with the FreeAgent API (bank transactions, bills, invoices, and accounting reports).
 
 ## Quickstart
@@ -64,3 +68,57 @@ CLI helpers for interacting with the FreeAgent API (bank transactions, bills, in
 - You can also supply all settings via environment variables (FREEAGENT_*); `.env` is just a convenience.
 - Payroll, salary, and dividends endpoints are not available via the public FreeAgent API; related commands
   are intentionally omitted.
+
+## Development
+
+### Setup
+
+```bash
+# Install pre-commit hooks
+pip install pre-commit
+pre-commit install
+
+# Install Python dependencies (for devcontainer)
+pip install -r .devcontainer/requirements.txt
+```
+
+### Testing and Validation
+
+```bash
+# Run all pre-commit checks
+pre-commit run -a
+
+# Run specific checks
+pre-commit run markdownlint -a
+pre-commit run yamllint -a
+pre-commit run black -a
+pre-commit run flake8 -a
+```
+
+### GitHub Workflows
+
+This repository uses several GitHub Actions workflows:
+
+- **Check**: Runs pre-commit hooks and actionlint on all pushes and PRs
+- **Claude Code**: AI-powered development assistance via `@claude` mentions
+- **Claude Code Review**: Automated PR reviews using Claude
+- **DevContainer CI**: Tests devcontainer builds when devcontainer files change
+
+**Required Secrets**: Configure `ANTHROPIC_API_KEY` in repository settings for Claude workflows.
+
+## Contributing
+
+See [AGENTS.md](AGENTS.md) for development guidelines and [CLAUDE.md](CLAUDE.md) for AI assistance usage.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+<!-- Named links -->
+
+[pr-reviews-image]: https://img.shields.io/github/issues-pr/Cogni-AI-OU/freeagent-fin-ops?label=PR+Reviews&logo=github
+[pr-reviews-link]: https://github.com/Cogni-AI-OU/freeagent-fin-ops/pulls
+[license-image]: https://img.shields.io/badge/License-MIT-blue.svg
+[license-link]: https://tldrlegal.com/license/mit-license
+[gha-image-check]: https://github.com/Cogni-AI-OU/freeagent-fin-ops/workflows/Check/badge.svg
+[gha-link-check]: https://github.com/Cogni-AI-OU/freeagent-fin-ops/actions?query=workflow%3ACheck

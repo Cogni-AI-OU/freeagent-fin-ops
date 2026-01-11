@@ -1,0 +1,7 @@
+coreutils
+gh
+git
+mawk
+sed
+time
+vim
