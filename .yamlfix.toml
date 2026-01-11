@@ -3,7 +3,7 @@
 # @docs: <https://lyz-code.github.io/yamlfix/>
 # This file should be in the root directory of the project
 
-line_length = 110
+line_length = 120
 
 # Force sequences to use block style (multi-line lists)
 sequence_style = "block_style"
