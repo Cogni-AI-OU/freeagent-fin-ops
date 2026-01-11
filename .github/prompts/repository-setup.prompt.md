@@ -120,13 +120,26 @@ exist. Do not skip items just because a file already exists.
         types: [opened]
       pull_request_review:
         types: [submitted]
+    permissions:
+      actions: read
+      contents: write
+      id-token: write
+      issues: write
+      pull-requests: write
     jobs:
       claude:
         uses: Cogni-AI-OU/.github/.github/workflows/claude.yml@main
+        permissions:
+          actions: read
+          contents: write
+          id-token: write
+          issues: write
+          pull-requests: write
         secrets: inherit
     ```
 
   - Note: Requires `ANTHROPIC_API_KEY` secret to be set in repository settings
+  - Note: Workflow-level permissions are required when calling reusable workflows with job-level permissions
 
 - [ ] **`.github/workflows/claude-review.yml`**
   - Check if file exists
@@ -140,14 +153,28 @@ exist. Do not skip items just because a file already exists.
     name: Claude Code Review
     on:
       pull_request:
-        types: [opened, synchronize]
+        types: [edited, opened, ready_for_review, reopened, review_requested]
+      workflow_call:
+    permissions:
+      actions: read
+      contents: write
+      id-token: write
+      issues: write
+      pull-requests: write
     jobs:
       claude-review:
         uses: Cogni-AI-OU/.github/.github/workflows/claude-review.yml@main
+        permissions:
+          actions: read
+          contents: write
+          id-token: write
+          issues: write
+          pull-requests: write
         secrets: inherit
     ```
 
   - Note: Requires `ANTHROPIC_API_KEY` secret to be set in repository settings
+  - Note: Workflow-level permissions are required when calling reusable workflows with job-level permissions
 
 - [ ] **`.github/workflows/devcontainer-ci.yml`**
   - Check if file exists (only if `.devcontainer/` directory exists)
@@ -172,9 +199,25 @@ exist. Do not skip items just because a file already exists.
     jobs:
       devcontainer-build:
         uses: Cogni-AI-OU/.github/.github/workflows/devcontainer-ci.yml@main
+        permissions:
+          contents: read
+          packages: write  # Required for pushing to GitHub Container Registry
     ```
 
-  - Customize: Add repository-specific required commands/packages via workflow inputs
+  - Note: The `packages: write` permission is **required** for the workflow to push container images to GHCR
+  - Customize: Add repository-specific required commands/packages via workflow inputs:
+
+    ```yaml
+    jobs:
+      devcontainer-build:
+        uses: Cogni-AI-OU/.github/.github/workflows/devcontainer-ci.yml@main
+        permissions:
+          contents: read
+          packages: write
+        with:
+          required_commands: 'docker npm python3'
+          required_python_packages: 'ansible pre-commit'
+    ```
 
 - [ ] **`.github/actionlint-matcher.json`**
   - Check if file exists

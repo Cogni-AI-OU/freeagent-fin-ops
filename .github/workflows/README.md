@@ -1,15 +1,15 @@
 # GitHub Actions Workflows
 
-This directory contains GitHub Actions workflows that automate various tasks for this repository.
+This directory contains GitHub Actions workflows that automate various tasks.
 
 ## Workflows
 
 ### check.yml
 
-**Purpose**: Runs automated checks on all pushes and pull requests to ensure code quality and adherence to
-project standards.
+**Purpose**: Runs automated checks on all pushes, pull requests, and on a weekly schedule to ensure code quality
+and adherence to project standards.
 
-**Reusable**: This workflow calls the organization's reusable workflow:
+**Reusable**: This workflow can be called from other repositories using:
 
 ```yaml
 uses: Cogni-AI-OU/.github/.github/workflows/check.yml@main
@@ -27,12 +27,29 @@ uses: Cogni-AI-OU/.github/.github/workflows/check.yml@main
 **Purpose**: Provides automated code review for pull requests using Claude AI. Reviews focus on bugs, security
 vulnerabilities, performance issues, and missing error handling.
 
-**Reusable**: This workflow calls the organization's reusable workflow:
+**Reusable**: This workflow can be called from other repositories using:
 
 ```yaml
-uses: Cogni-AI-OU/.github/.github/workflows/claude-review.yml@main
-secrets: inherit
+# In another repository's workflow
+jobs:
+  claude-review:
+    uses: Cogni-AI-OU/.github/.github/workflows/claude-review.yml@main
+    with:
+      pr_number: ${{ github.event.pull_request.number }}
+      # Optional: Customize the Claude model (default: claude-opus-4-5)
+      model: 'claude-opus-4-5'
+      # Optional: Add additional instructions to the review prompt
+      additional_prompt: |
+        - Check for accessibility issues
+        - Verify all functions have proper documentation
+    secrets: inherit
 ```
+
+**Inputs**:
+
+- `pr_number` (required): Pull request number to review
+- `model` (optional): Claude model to use (default: `claude-opus-4-5`)
+- `additional_prompt` (optional): Additional instructions to append to the review prompt
 
 **Jobs**:
 
@@ -41,9 +58,9 @@ secrets: inherit
 
 **Configuration**:
 
-- Runs on pull requests (opened and synchronized)
-- Skips bot-authored PRs automatically
-- Uses Claude Opus 4.5 model by default
+- Runs on pull requests (not on bot-authored PRs) or via workflow_call
+- When using workflow_call, requires `pr_number` input
+- Uses Claude Opus 4.5 model by default (configurable via `model` input)
 - Limited to specific allowed tools for security
 
 **Reference**: Uses [anthropics/claude-code-action][claude-action]
@@ -53,12 +70,19 @@ secrets: inherit
 **Purpose**: Enables interactive collaboration with Claude AI on issues and pull requests. Claude can be
 triggered by mentioning `@claude` in comments, reviews, or newly opened issues.
 
-**Reusable**: This workflow calls the organization's reusable workflow:
+**Reusable**: This workflow can be called from other repositories using:
 
 ```yaml
 uses: Cogni-AI-OU/.github/.github/workflows/claude.yml@main
+with:
+  # Optional: Customize the Claude model (default: claude-opus-4-5)
+  model: 'claude-opus-4-5'
 secrets: inherit
 ```
+
+**Inputs**:
+
+- `model` (optional): Claude model to use (default: `claude-opus-4-5`)
 
 **Jobs**:
 
@@ -72,7 +96,7 @@ secrets: inherit
 
 **Configuration**:
 
-- Uses Claude Opus 4.5 model by default
+- Uses Claude Opus 4.5 model by default (configurable via `model` input)
 - Maximum 100 turns per conversation
 - Grants broad git access for autonomous commits (requires repository branch protection)
 
@@ -83,11 +107,29 @@ secrets: inherit
 **Purpose**: Builds and tests the development container configuration to ensure all required tools and
 dependencies are properly installed.
 
-**Reusable**: This workflow calls the organization's reusable workflow:
+**Reusable**: This workflow can be called from other repositories using:
 
 ```yaml
-uses: Cogni-AI-OU/.github/.github/workflows/devcontainer-ci.yml@main
+# In another repository's workflow
+jobs:
+  devcontainer:
+    uses: Cogni-AI-OU/.github/.github/workflows/devcontainer-ci.yml@main
+    permissions:
+      contents: read
+      packages: write  # Required for pushing to GitHub Container Registry
+    with:
+      # Optional: Customize required commands (space-separated)
+      required_commands: 'docker npm python3'
+      # Optional: Customize required Python packages (space-separated)
+      required_python_packages: 'ansible pre-commit'
 ```
+
+**Inputs**:
+
+- `required_commands` (optional): Space-separated list of required command-line tools. Defaults to a
+  comprehensive set including actionlint, ansible, docker, gh, make, node, npm, pip, pre-commit, python3, and rg.
+- `required_python_packages` (optional): Space-separated list of required Python packages. Defaults to ansible,
+  ansible-lint, docker, molecule, pre-commit, and uv.
 
 **Jobs**:
 
@@ -98,6 +140,12 @@ uses: Cogni-AI-OU/.github/.github/workflows/devcontainer-ci.yml@main
 
 - Pull requests affecting `.devcontainer/` or this workflow
 - Pushes to main branch affecting `.devcontainer/` or this workflow
+- Weekly schedule (Mondays at 00:00 UTC)
+- Reusable workflow call
+
+**Permissions**: When calling this workflow from another repository, you **must** grant `packages: write`
+permission to allow pushing container images to GitHub Container Registry. The workflow will fail with a
+permission error if this is not set in the calling workflow.
 
 **Reference**: Uses [devcontainers/ci][devcontainer-ci-action]
 

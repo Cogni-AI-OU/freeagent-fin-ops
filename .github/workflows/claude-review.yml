@@ -7,8 +7,16 @@ name: Claude Code Review
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    # Note: synchronize not included to avoid too frequent reviews on every push.
+    types: [edited, opened, ready_for_review, reopened, review_requested]
   workflow_call:
+
+permissions:
+  actions: read
+  contents: write
+  id-token: write
+  issues: write
+  pull-requests: write
 
 jobs:
   claude-review:
@@ -22,6 +30,3 @@ jobs:
       issues: write
       pull-requests: write
     secrets: inherit  # pragma: allowlist secret
-    with:
-      # Only pass pr_number when triggered by pull_request event to avoid null values in workflow_call context
-      pr_number: ${{ github.event.pull_request.number || '' }}
