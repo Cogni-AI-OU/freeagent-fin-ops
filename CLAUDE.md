@@ -40,7 +40,7 @@ they are posted through the GitHub Actions workflow.
 
 ### Model Selection
 
-By default, workflows use `claude-opus-4-5`. The model is configured in the
+By default, workflows use Claude Opus 4.5 (`claude-opus-4-5`). The model is configured in the
 organization's `.github` repository workflow templates.
 
 ## Tools
