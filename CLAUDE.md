@@ -31,12 +31,16 @@ issues. This prevents unauthorized API usage and ensures code changes are review
 by trusted users.
 
 **Note**: Claude's comments appear under the `github-actions[bot]` user because
-they are posted through the GitHub Actions workflow.
+they are posted through the GitHub Actions workflow. The workflow identifies
+Claude's comments specifically by looking for the `claude-code-action` marker
+to avoid confusion with other workflows that also post as `github-actions[bot]`.
+This is a limitation of the `anthropics/claude-code-action` and cannot be changed
+to display as `claude[bot]` at the workflow configuration level.
 
 ### Environment Variables
 
 - `ANTHROPIC_API_KEY`: API key for Claude (stored as repository secret)
-- Required secrets must be configured in repository settings
+- `ALLOWED_TOOLS`: Comma-separated list of tools Claude can use
 
 ### Model Selection
 
@@ -50,25 +54,38 @@ and environment.
 
 ### Allowed Tools
 
-The allowed tools are defined in the organization's workflow files. Current categories include:
+The allowed tools are defined in workflow files under the `ALLOWED_TOOLS`
+environment variable. Current categories include:
 
-- **File operations**: Edit, Read, Write, Glob, Grep, LS
-- **Git operations**: Full git access for commits and pushes
-- **GitHub CLI**: Issue and PR management commands
-- **Data processing**: jq, yq for JSON/YAML manipulation
-- **Pre-commit**: Running linting and validation
+- **Git operations**: `Bash(git:*)` - Full access for commits and pushes
+- **GitHub CLI**: `Bash(gh issue:*)`, `Bash(gh pr:*)`, `Bash(gh search:*)`
+- **Data processing**: `Bash(jq:*)`, `Bash(yq:*)`
+- **Pre-commit**: `Bash(pre-commit run:*)` - Run code quality checks
+
+If you need a tool that isn't in the allowed tools list, suggest adding it to
+the relevant workflow file in `.github/workflows/`.
+
+**Note on git access**: You have broad git access to commit and push changes.
+The workflow has strict access controls ensuring only trusted users can trigger you.
+Repository administrators are responsible for configuring branch protection and
+monitoring commit activity.
 
 ### Model Context Protocol (MCP)
 
 MCP servers extend Claude's capabilities with additional tools and integrations.
+When MCP is enabled via `--mcp-config-file`, you gain access to:
 
-**Built-in MCP Servers:**
+- GitHub API integrations (issues, PRs, repositories)
+- External service integrations
+- Custom tool implementations
 
-The Claude Code Action automatically provides these MCP servers:
+**Custom MCP Configuration:**
 
-- `github_comment`: Post and update PR/issue comments
-- `github_inline_comment`: Create inline code review comments
-- `github_ci`: Access CI status and workflow run details
+MCP configuration is maintained in a separate config file (`.github/mcp-config.json`)
+and referenced in workflow files using the `--mcp-config-file` flag.
+
+For information on configuring custom MCP servers, see the
+[Custom Agents documentation](.github/agents/README.md).
 
 ## Prompting Best Practices
 
@@ -109,10 +126,16 @@ When working with Claude in this repository:
 
 ### Common Issues
 
-1. **Workflow not triggering**: Check `@claude` mentions and workflow logs
-2. **Linting failures**: Run `pre-commit run -a` locally
-3. **API authentication**: Verify `FREEAGENT_*` environment variables
-4. **CLI execution**: Ensure Python 3.11+ and dependencies are installed
+1. **Workflow not triggering**: The workflow triggers for `@claude` mentions or replies
+   to comments from `github-actions[bot]`. Check workflow logs for permission issues.
+2. **Tool not allowed**: Check if the tool is in `ALLOWED_TOOLS`; request addition
+   via PR if needed.
+3. **Linting failures**: Run `pre-commit run -a` locally to identify issues before
+   committing.
+4. **MCP connection errors**: Verify the MCP server URL and authentication in
+   workflow configuration.
+5. **API authentication**: Verify `FREEAGENT_*` environment variables
+6. **CLI execution**: Ensure Python 3.11+ and dependencies are installed
 
 ### Testing Changes
 
