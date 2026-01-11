@@ -190,9 +190,10 @@ exist. Do not skip items just because a file already exists.
 
 - [ ] **`.github/README.md`**
   - Check if file exists
-  - Reference: `https://github.com/Cogni-AI-OU/.github/blob/main/.github/README.md`
+  - Reference: `https://github.com/Cogni-AI-OU/.github/blob/main/.github/README.template.md`
   - Purpose: Documentation for GitHub workflows, agents, and problem matchers
-  - Action: Copy from reference if missing; customize for repository-specific workflows
+  - Action: Copy from reference (README.template.md) as `.github/README.md` if missing;
+    customize for repository-specific workflows
   - Content: Workflow templates overview, agent prompts usage, problem matchers configuration, security notes
   - Customize: Update workflow references and add repository-specific workflow documentation
 
@@ -513,14 +514,14 @@ Follow the phases in order:
 
 A successful repository setup includes:
 
-- [x] All essential configuration files present and valid
-- [x] Pre-commit hooks configured and working
-- [x] GitHub Actions workflows configured (using remote references where possible)
-- [x] Devcontainer configured (if using containerized development)
-- [x] Documentation updated (README, AGENTS.md, etc.)
-- [x] All linters passing
-- [x] Repository follows organization standards
-- [x] Repository-specific needs addressed
+- [ ] All essential configuration files present and valid
+- [ ] Pre-commit hooks configured and working
+- [ ] GitHub Actions workflows configured (using remote references where possible)
+- [ ] Devcontainer configured (if using containerized development)
+- [ ] Documentation updated (README, AGENTS.md, etc.)
+- [ ] All linters passing
+- [ ] Repository follows organization standards
+- [ ] Repository-specific needs addressed
 
 ## Final Deliverables
 

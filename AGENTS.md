@@ -5,8 +5,8 @@ Guidance for automation agents working in this repository.
 ## Quick Start
 
 - See [README.md](README.md) for setup and installation instructions
-- This is a Python 3.11+ project using `uv` for script execution
-- OAuth2-enabled FreeAgent API client for bank accounts, transactions, bills, invoices, and reports
+- See [.tours/getting-started.tour](.tours/getting-started.tour) for a guided walkthrough
+- For enhanced agent capabilities, see [Copilot Plus](.github/agents/copilot-plus.agent.md)
 
 ## Instructions
 
@@ -27,13 +27,11 @@ For specific tasks, use the following specialized agent instructions:
 
 ## Common Tasks
 
-### Before the changes
+### Before each commit
 
-Before each commit change:
-
-- Verify your expected changes by `git diff --no-color`.
-- Use linting and validation tools used by project to confirm your changes meet the coding standard.
-- If repo uses git hooks, run them to validate your changes.
+- Verify your expected changes with `git diff --no-color`.
+- Use the project linting/validation tools to confirm your changes meet the coding standard.
+- If the repo uses git hooks, run them to validate your changes.
 
 ### Linting and Validation
 
@@ -46,11 +44,11 @@ pre-commit run markdownlint -a
 pre-commit run yamllint -a
 ```
 
-### Understanding the task
+### Understanding the Task
 
-- When task is not clear, check further relevant information for better clarity.
-- If triggered by a short comment, check if parent's comment exist and consist further information.
-- If none of above helps, and task is ambiguous, comminicate to the user with potential options.
+- When the task is not clear, look for additional context.
+- If triggered by a brief comment, check whether the parent comment exists and includes more detail.
+- If it's still ambiguous, communicate with the user and propose options.
 
 ### Testing
 
@@ -60,6 +58,14 @@ molecule test
 
 # Syntax check
 molecule syntax
+```
+
+```bash
+# Run tests if available
+python -m pytest tests/
+
+# Test CLI script manually
+./scripts/fa_cli.py --help
 ```
 
 ### Adding or Modifying Workflows
@@ -95,7 +101,6 @@ on top of the updated target branch:
 - **Always** verify with `git diff` that only your changes remain
 - **Use** `GIT_EDITOR=true` for non-interactive cherry-pick operations
 
-
 ### Running the CLI
 
 ```bash
@@ -119,16 +124,6 @@ on top of the updated target branch:
 ./scripts/fa_cli.py reports profit-and-loss
 ```
 
-### Testing
-
-```bash
-# Run tests if available
-python -m pytest tests/
-
-# Test CLI script manually
-./scripts/fa_cli.py --help
-```
-
 ### Environment Setup
 
 ```bash
@@ -149,16 +144,6 @@ cp .env.example .env
 - **OAuth2 Flow**: Uses authorization code flow with token refresh
 - **Output Formats**: Supports plain, csv, json, and yaml output formats
 - **Pagination**: Built-in pagination support with configurable page size
-
-## Project Structure
-
-- `.devcontainer/`: Development container configuration
-- `.github/`: GitHub workflows and instructions
-- `docs/`: How-to guides and documentation
-- `scripts/`: CLI scripts (main: `fa_cli.py`)
-- `tests/`: Test files
-- `.env.example`: Example environment configuration
-
 
 ## References
 
@@ -190,7 +175,9 @@ If Copilot or automated checks behave unexpectedly:
 - Verify `.markdownlint.yaml` and `.yamllint` have not been modified incorrectly.
 - If problems persist, open an issue with details of the command run and any error output.
 
-### FreeAgent API Issues
+### Project-specific issues
+
+FreeAgent API Issues:
 
 - Check API rate limits (429 responses)
 - Verify OAuth tokens are valid (refresh on 401)

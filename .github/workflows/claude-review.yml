@@ -23,4 +23,5 @@ jobs:
       pull-requests: write
     secrets: inherit  # pragma: allowlist secret
     with:
-      pr_number: ${{ github.event.pull_request.number }}
+      # Only pass pr_number when triggered by pull_request event to avoid null values in workflow_call context
+      pr_number: ${{ github.event.pull_request.number || '' }}

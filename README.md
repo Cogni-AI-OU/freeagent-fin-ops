@@ -95,20 +95,26 @@ pre-commit run black -a
 pre-commit run flake8 -a
 ```
 
-### GitHub Workflows
+## AI Agents
 
-This repository uses several GitHub Actions workflows:
+This repository provides AI agent configurations for automated development.
 
-- **Check**: Runs pre-commit hooks and actionlint on all pushes and PRs
-- **Claude Code**: AI-powered development assistance via `@claude` mentions
-- **Claude Code Review**: Automated PR reviews using Claude
-- **DevContainer CI**: Tests devcontainer builds when devcontainer files change
+### Agent Configuration Files
 
-**Required Secrets**: Configure `ANTHROPIC_API_KEY` in repository settings for Claude workflows.
+| File/Directory | Audience | Purpose |
+| -------------- | -------- | ------- |
+| [AGENTS.md](AGENTS.md) | All agents | Repository-specific guidance and workflows |
+| [CLAUDE.md](CLAUDE.md) | Claude | Claude-specific configuration |
+| [.github/copilot-instructions.md](.github/copilot-instructions.md) | Copilot | Coding standards and project context |
+| [.github/agents/](.github/agents/) | Orchestrators | Specialized agent configs for specific tasks |
+| [.github/skills/](.github/skills/) | All agents | Reusable capabilities (git, GitHub Actions, etc.) |
+| [.github/prompts/](.github/prompts/) | All | Automation prompt templates |
+| [.github/instructions/](.github/instructions/) | Linters & agents | Language-specific code standards |
 
-## Contributing
+## GitHub Actions
 
-See [AGENTS.md](AGENTS.md) for development guidelines and [CLAUDE.md](CLAUDE.md) for AI assistance usage.
+For documentation on GitHub Actions workflows, problem matchers, and CI/CD
+configuration, see [.github/README.template.md](.github/README.template.md).
 
 ## License
 
