@@ -1,6 +1,6 @@
 # AGENTS.md
 
-[Guidance for coding agents](https://agents.md/) working in this repository.
+Guidance for coding agents working in this repository.
 
 ## Quick Start
 
@@ -92,7 +92,7 @@ on top of the updated target branch:
 5. Verify only your changes remain
 
 **For detailed step-by-step instructions with commands**, see:
-[`.github/skills/git/SKILL.md` - "Integrating Changes from Target Branch"](.github/skills/git/SKILL.md#integrating-changes-from-target-branch-avoiding-merge-commits)
+[`.github/skills/git/SKILL.md`](.github/skills/git/SKILL.md)
 
 ### Key Points
 

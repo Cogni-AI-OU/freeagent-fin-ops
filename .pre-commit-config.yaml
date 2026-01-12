@@ -84,3 +84,9 @@ repos:
     rev: v1.5.0
     hooks:
       - id: detect-secrets
+  - repo: https://github.com/tcort/markdown-link-check
+    rev: v3.14.2
+    hooks:
+      - id: markdown-link-check
+        args:
+          - --quiet

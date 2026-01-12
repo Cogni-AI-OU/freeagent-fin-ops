@@ -21,6 +21,7 @@ For more information, see
 | [github-actions](github-actions/SKILL.md) | Diagnosing and debugging failing GitHub Actions workflows |
 | [pre-commit](pre-commit/SKILL.md) | Guide for using pre-commit hooks to validate code formatting, linting, and security checks |
 | [robust-commands](robust-commands/SKILL.md) | Resilient command execution with automatic fallbacks and error recovery |
+| [shell](shell/SKILL.md) | Efficient shell command execution with timing, timeouts, and best practices |
 | [skill-writer](skill-writer/SKILL.md) | Generate or update SKILL.md files for GitHub Copilot coding agents |
 
 ## Creating skills
@@ -41,7 +42,7 @@ Instructions for Copilot to follow when this skill is activated.
 ### SKILL.md frontmatter
 
 | Field | Required | Description |
-| ----- | ----------- | ----------- |
+| ----- | -------- | ----------- |
 | `name` | Yes | Unique identifier (lowercase, hyphens for spaces) |
 | `description` | Yes | What the skill does and when to use it |
 | `license` | No | License that applies to this skill |
@@ -73,7 +74,7 @@ the skill's directory.
 
 Find and share skills with the community:
 
-- [anthropics/skills](https://github.com/anthropics/skills) — Reference skills
+- [anthropics/skills](https://github.com/anthropics/skills) - Reference skills
   repository
-- [github/awesome-copilot](https://github.com/github/awesome-copilot) — Community
+- [github/awesome-copilot](https://github.com/github/awesome-copilot) - Community
   collection of Copilot resources
