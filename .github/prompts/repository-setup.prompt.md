@@ -73,7 +73,7 @@ exist. Do not skip items just because a file already exists.
   - Standard patterns: localhost, 127.0.0.1, example.com URLs, placeholder GitHub URLs
   - Customize: Add URLs that require authentication or block automated requests
   - Note: Supports regular expressions (one expression per line)
-  - Note: Don't add there blocked URLs by firewall as for workaround to pass linters
+  - Note: Don't add blocked URLs there as a workaround to pass linters
 
 - [ ] **`.markdown-link-check.json`**
   - Check if file exists in repository root
@@ -83,7 +83,7 @@ exist. Do not skip items just because a file already exists.
   - Standard settings: timeout, ignorePatterns for localhost/example.com, retryOn429, aliveStatusCodes
   - Customize: Add repository-specific ignore patterns, timeout values, or HTTP headers
   - Note: Supports JSON configuration with regex patterns, replacement patterns, and status code handling
-  - Note: Don't add there blocked URLs by firewall as for workaround to pass linters
+  - Note: Don't add blocked URLs there as a workaround to pass linters
 
 - [ ] **`.yamllint`**
   - Check if file exists in repository root
@@ -406,6 +406,7 @@ exist. Do not skip items just because a file already exists.
   - Action: Copy relevant agent files based on repository needs
   - Required agents:
     - `code-tour.agent.md` - For creating/updating `.tours/` files (always include)
+    - `FIREWALL.md` - Firewall allowlist for Copilot agents (always include)
     - `README.md` - Documentation of available agents
   - Optional agents:
     - `copilot-plus.agent.md` - Enhanced Copilot with critical thinking
@@ -474,6 +475,14 @@ exist. Do not skip items just because a file already exists.
   - Note any manual steps required (e.g., setting secrets)
 
 ## Important Notes
+
+### File References and Organization Repository
+
+When working with this prompt, you may encounter references to files that don't exist in the target
+repository. Before creating new files, always check if they already exist in the organization's `.github`
+repository at `https://github.com/Cogni-AI-OU/.github`. Many files are meant to be copied or referenced
+from the organization repository rather than created from scratch. This ensures consistency across all
+repositories and reduces maintenance overhead.
 
 ### Remote Workflow References
 
