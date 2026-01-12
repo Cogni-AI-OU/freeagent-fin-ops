@@ -57,6 +57,22 @@
           "message": 4
         }
       ]
+    },
+    {
+      "owner": "lychee",
+      "severity": "error",
+      "pattern": [
+        {
+          "regexp": "^### Errors in (.+)$",
+          "file": 1
+        },
+        {
+          "regexp": "^Error: .+\\] <(.+?)> \\| (.+)$",
+          "line": 1,
+          "message": 2,
+          "loop": true
+        }
+      ]
     }
   ]
 }
