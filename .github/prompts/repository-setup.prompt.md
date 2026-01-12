@@ -139,7 +139,6 @@ exist. Do not skip items just because a file already exists.
     ```
 
   - Note: Requires `ANTHROPIC_API_KEY` secret to be set in repository settings
-  - Note: Workflow-level permissions are required when calling reusable workflows with job-level permissions
 
 - [ ] **`.github/workflows/claude-review.yml`**
   - Check if file exists

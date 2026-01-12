@@ -114,7 +114,7 @@ This repository provides AI agent configurations for automated development.
 ## GitHub Actions
 
 For documentation on GitHub Actions workflows, problem matchers, and CI/CD
-configuration, see [.github/README.template.md](.github/README.template.md).
+configuration, see [.github/README.md](.github/README.template.md).
 
 ## License
 
