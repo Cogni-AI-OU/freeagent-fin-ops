@@ -11,5 +11,6 @@ http://example.com
 https://example.com
 https://github.com/org/repo
 
-# URLs that require authentication or may block automated requests
-# Add patterns here as needed based on actual link check failures
+# URLs that are blocked for automated requests
+# please maintain at .github/agents/FIREWALL.md
+# otherwise don't add potential valid links here.

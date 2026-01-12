@@ -65,6 +65,26 @@ exist. Do not skip items just because a file already exists.
   - Action: Create if missing (can be empty initially)
   - Customize: Add paths to exclude (e.g., `node_modules/`, `vendor/`, generated docs)
 
+- [ ] **`.lycheeignore`**
+  - Check if file exists in repository root
+  - Reference: `https://github.com/Cogni-AI-OU/.github/blob/main/.lycheeignore`
+  - Purpose: URL patterns to exclude from link checking with lychee
+  - Action: Create if missing with standard ignore patterns
+  - Standard patterns: localhost, 127.0.0.1, example.com URLs, placeholder GitHub URLs
+  - Customize: Add URLs that require authentication or block automated requests
+  - Note: Supports regular expressions (one expression per line)
+  - Note: Don't add there blocked URLs by firewall as for workaround to pass linters
+
+- [ ] **`.markdown-link-check.json`**
+  - Check if file exists in repository root
+  - Reference: `https://github.com/Cogni-AI-OU/.github/blob/main/.markdown-link-check.json`
+  - Purpose: Configuration for markdown-link-check to customize link validation behavior
+  - Action: Create if missing with standard configuration
+  - Standard settings: timeout, ignorePatterns for localhost/example.com, retryOn429, aliveStatusCodes
+  - Customize: Add repository-specific ignore patterns, timeout values, or HTTP headers
+  - Note: Supports JSON configuration with regex patterns, replacement patterns, and status code handling
+  - Note: Don't add there blocked URLs by firewall as for workaround to pass linters
+
 - [ ] **`.yamllint`**
   - Check if file exists in repository root
   - Reference: `https://github.com/Cogni-AI-OU/.github/blob/main/.yamllint`
@@ -161,7 +181,6 @@ exist. Do not skip items just because a file already exists.
     ```
 
   - Note: Requires `ANTHROPIC_API_KEY` secret to be set in repository settings
-  - Note: Workflow-level permissions are required when calling reusable workflows with job-level permissions
 
 - [ ] **`.github/workflows/devcontainer-ci.yml`**
   - Check if file exists (only if `.devcontainer/` directory exists)
@@ -347,6 +366,15 @@ exist. Do not skip items just because a file already exists.
   - Action: Create if missing
   - Content: Triggering info, allowed tools, model selection, MCP config
   - Customize: Adjust allowed tools and MCP servers for repository needs
+
+- [ ] **`.gemini/settings.json`**
+  - Check if `.gemini/` directory and file exist
+  - Reference: `https://github.com/Cogni-AI-OU/.github/blob/main/.gemini/settings.json`
+  - Purpose: Google Gemini AI configuration
+  - Action: Create if missing
+  - Content: Configuration that points Gemini to use `AGENTS.md` as the context file
+  - Format: JSON file with `contextFileName` property
+  - Example: `{ "contextFileName": "AGENTS.md" }`
 
 - [ ] **`.github/copilot-instructions.md`**
   - Check if file exists
