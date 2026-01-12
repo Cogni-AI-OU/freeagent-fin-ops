@@ -120,12 +120,6 @@ exist. Do not skip items just because a file already exists.
         types: [opened]
       pull_request_review:
         types: [submitted]
-    permissions:
-      actions: read
-      contents: write
-      id-token: write
-      issues: write
-      pull-requests: write
     jobs:
       claude:
         uses: Cogni-AI-OU/.github/.github/workflows/claude.yml@main
@@ -154,12 +148,6 @@ exist. Do not skip items just because a file already exists.
       pull_request:
         types: [edited, opened, ready_for_review, reopened, review_requested]
       workflow_call:
-    permissions:
-      actions: read
-      contents: write
-      id-token: write
-      issues: write
-      pull-requests: write
     jobs:
       claude-review:
         uses: Cogni-AI-OU/.github/.github/workflows/claude-review.yml@main
