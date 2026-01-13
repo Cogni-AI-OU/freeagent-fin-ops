@@ -71,7 +71,8 @@ exist. Do not skip items just because a file already exists.
   - Purpose: URL patterns to exclude from link checking with lychee
   - Action: Create if missing with standard ignore patterns
   - Standard patterns: localhost, 127.0.0.1, example.com URLs, placeholder GitHub URLs
-  - Customize: Add URLs that require authentication or block automated requests
+  - Customize: Add URLs that require authentication or block automated reque
+ts
   - Note: Supports regular expressions (one expression per line)
   - Note: Don't add blocked URLs there as a workaround to pass linters
 
@@ -254,6 +255,29 @@ exist. Do not skip items just because a file already exists.
   - Content: Workflow descriptions, usage examples, inputs/outputs, security considerations
   - Customize: Add documentation for any custom workflows specific to the repository
 
+- [ ] **`.github/workflows/AGENTS.md`**
+  - Check if file exists
+  - Reference: `https://github.com/Cogni-AI-OU/.github/blob/main/.github/workflows/AGENTS.md`
+  - Purpose: Agent catalog describing workflows, triggers, and inputs
+  - Action: Create if missing; update when workflows are added, removed, or renamed
+
+- [ ] **`.github/prompts/` directory**
+  - Check if directory exists with prompt files
+  - Reference: `https://github.com/Cogni-AI-OU/.github/tree/main/.github/prompts`
+  - Purpose: Prompt templates for GitHub Models, Claude, and Copilot
+  - Action: Include relevant prompt files; keep formats (Markdown/YAML) as upstream
+  - Available prompts:
+    - `default.prompt.yml` - Default prompt for agent-ai workflow
+    - `repository-setup.prompt.md` - This setup prompt
+    - `test.prompt.yml` - Example prompt
+  - Customize: Add prompts for repository-specific tasks as needed
+
+- [ ] **`.github/prompts/AGENTS.md`**
+  - Check if file exists
+  - Reference: `https://github.com/Cogni-AI-OU/.github/blob/main/.github/prompts/AGENTS.md`
+  - Purpose: Catalog of prompts with format and intended use for agents
+  - Action: Create if missing; update when prompts change
+
 ### Phase 4: Development Container Configuration
 
 - [ ] **`.devcontainer/devcontainer.json`**
@@ -399,6 +423,12 @@ exist. Do not skip items just because a file already exists.
     - `yaml.instructions.md` - YAML formatting
   - Customize: Only include files relevant to languages/formats used in repository
 
+- [ ] **`.github/instructions/AGENTS.md`**
+  - Check if file exists
+  - Reference: `https://github.com/Cogni-AI-OU/.github/blob/main/.github/instructions/AGENTS.md`
+  - Purpose: Catalog of instruction files with scopes for agents
+  - Action: Create if missing and keep in sync when instruction files change
+
 - [ ] **`.github/agents/` directory**
   - Check if directory exists with custom agent files
   - Reference: `https://github.com/Cogni-AI-OU/.github/tree/main/.github/agents`
@@ -449,7 +479,9 @@ exist. Do not skip items just because a file already exists.
 
 - [ ] **Validate all created/updated files**
   - Run pre-commit checks: `pre-commit run -a`
-    In case of errors, compare `.pre-commit-config.yaml` with upstream if anything else is missing.
+    - If errors occur, compare `.pre-commit-config.yaml` with upstream to ensure all required hooks are present
+    - Then fix any remaining linting errors reported by the hooks
+    - Note: In case of firewall issues, don't add blocked URLs to ignore list to pass the linters
     Otherwise fix any reported linting errors found
   - Ensure all YAML files are valid: `yamllint .`
   - Ensure all Markdown files are valid: `markdownlint **/*.md`

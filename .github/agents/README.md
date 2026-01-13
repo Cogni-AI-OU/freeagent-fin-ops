@@ -33,7 +33,8 @@ Expert agent for creating and maintaining VSCode CodeTour files. Features:
 - Download the desired agent configuration file (`*.agent.md`) and add it to your repository.
 - Use the Copilot CLI for local testing: [Copilot CLI](https://gh.io/customagents/cli).
 - Merge the agent configuration file into the default branch of your repository.
-- Access installed agents through the VS Code Chat interface, Copilot CLI, or assign them in CCA.
+- Access installed agents through the VS Code Chat interface, Copilot CLI,
+  or assign them in Copilot Coding Agent (CCA).
 
 For more details, see:
 

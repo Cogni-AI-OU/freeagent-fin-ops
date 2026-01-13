@@ -2,21 +2,24 @@
 
 Guidance for coding agents working in this repository.
 
-## Quick Start
+For general project guidance, see [README.md](README.md).
 
-- See [README.md](README.md) for setup and installation instructions
-- See [.tours/getting-started.tour](.tours/getting-started.tour) for a guided walkthrough
+## Required References
+
+- Project overview and install steps: [README.md](README.md)
+- Agent configuration and conventions: [.github/copilot-instructions.md](.github/copilot-instructions.md)
+- Language and format rules: see [.github/instructions/AGENTS.md](.github/instructions/AGENTS.md)
+- Workflow and navigation help: [.tours/getting-started.tour](.tours/getting-started.tour)
 - For enhanced agent capabilities, see [Copilot Plus](.github/agents/copilot-plus.agent.md)
 
-## Instructions
+## Agent Catalogs
 
-For detailed coding standards and formatting guidelines, refer to:
+Use these catalogs for authoritative, machine-readable lists of resources:
 
-- [Copilot Instructions](.github/copilot-instructions.md) - Main coding standards
-- [Ansible](.github/instructions/ansible.instructions.md) - Ansible conventions
-- [JSON](.github/instructions/json.instructions.md) - JSON formatting standards
-- [Markdown](.github/instructions/markdown.instructions.md) - Markdown standards
-- [YAML](.github/instructions/yaml.instructions.md) - YAML formatting standards
+- Skills: [.github/skills/AGENTS.md](.github/skills/AGENTS.md) - loadable skills and their SKILL.md entries
+- Instructions: [.github/instructions/AGENTS.md](.github/instructions/AGENTS.md) - formatting and language rules
+- Workflows: [.github/workflows/AGENTS.md](.github/workflows/AGENTS.md) - reusable GitHub Actions with inputs/triggers
+- Prompts: [.github/prompts/AGENTS.md](.github/prompts/AGENTS.md) - available prompt files
 
 ### Specialized Agents
 
