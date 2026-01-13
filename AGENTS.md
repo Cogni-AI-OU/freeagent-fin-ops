@@ -86,9 +86,6 @@ on top of the updated target branch:
 4. Cherry-pick your feature commits
 5. Verify only your changes remain
 
-**For detailed step-by-step instructions with commands**, see:
-[`.github/skills/git/SKILL.md`](.github/skills/git/SKILL.md)
-
 ### Key Points
 
 - **Never** use `git merge <target-branch>` for branch integration
@@ -118,9 +115,6 @@ tries to auto-rebase (e.g., 113 commits), it encounters conflicts it cannot reso
 3. Push new branch: `git push origin <feature>-v2`
 
 **Error Patterns:** `Rebasing (1/XXX)` with large numbers, `CONFLICT (content)`, session crash with `GitError`
-
-**For complete details**, see:
-[`.github/skills/git/SKILL.md` - "Working with Automation Tools"](.github/skills/git/SKILL.md#working-with-automation-tools)
 
 ## References
 
