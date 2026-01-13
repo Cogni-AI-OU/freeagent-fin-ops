@@ -21,34 +21,20 @@ complex challenges independently while maintaining awareness of your context win
 - **Seek alternatives**: For any tool or command that fails, identify and try alternative approaches
 - **Break down complexity**: When overwhelmed by complexity, decompose problems into manageable
   components or simplify your approach
-
-### Context-Aware Resource Management
-
-**CRITICAL: Always check resource sizes before consuming them to preserve your context window.**
-
-### Before Reading Files
-
-```bash
-# Check file size first
-wc -l <file> || stat -c%s <file>
-# For files >500 lines, use filtering:
-head -n 50 <file>    # View beginning
-tail -n 50 <file>    # View ending
-sed -n '100,200p' <file>  # View specific range
-grep -n "pattern" <file>   # Search for specific content
-```
-
-### Before Dumping Command Output
-
-```bash
-# Check output size first
-<command> | wc -l
-# For large output, use filtering:
-<command> | head -n 50    # First 50 lines
-<command> | tail -n 50    # Last 50 lines
-<command> | grep "pattern"  # Filter by pattern
-<command> | grep -E "error|fail|warn" -i  # Common errors
-```
+- **Build MREs**: When debugging, craft a minimal reproducible example that isolates the issue
+  while keeping the steps clear—even if it means a few extra lines
+- **Prune noise**: Eliminate any issues that are not relevant to the problem being debugged
+- **Describe the problem**: Start with a brief, descriptive summary of the issue you are tackling
+- **Divide and conquer**: If the source is unclear, add temporary debug statements to pinpoint where it breaks
+- **Trust but verify**: Confirm your assumptions with data—use breakpoints or logs
+  to inspect the real state rather than guessing
+- **Read the clues**: Re-read error messages and stack traces carefully; they often point directly
+  at the failing contract or location
+- **Change one thing at a time**: Make a single, deliberate edit between test runs so you know
+  which change caused which effect
+- **Context-Aware Resource Management**: Always be mindful of your context window limits.
+  Before reading files or dumping command outputs, assess their size and use filtering techniques
+  to minimize context usage.
 
 ### Working with Long Files
 
@@ -75,11 +61,11 @@ grep -n "pattern" <file>   # Search for specific content
 1. **Check if command exists**: `which <command> || command -v <command>`
 2. **If not found, try to install it**.
 3. **Try alternative commands**:
-   - `wc -l` fails → try `cat <file> | wc -l`
-   - `grep` fails → try `awk` or `sed`
-   - `jq` not available → try `python -m json.tool`
-   - `yq` not available → try `python -c "import yaml"`
-   - MCP not available → try `gh`
+   - `wc -l` fails,  try `cat <file> | wc -l`
+   - `grep` fails,  try `awk` or `sed`
+   - `jq` not available,  try `python -m json.tool`
+   - `yq` not available,  try `python -c "import yaml"`
+   - MCP not available,  try `gh`
 4. **Check permissions**: `ls -la <file>` before trying to read/write
 5. **Verify paths exist**: `test -f <file> && echo "exists" || echo "not found"`
 
@@ -232,7 +218,7 @@ grep -n "pattern" <file>   # Search for specific content
 
 ### Documentation
 
-- Keep docs concise—use `<placeholder>` instead of actual values
+- Keep docs concise - use `<placeholder>` instead of actual values
 - Update relevant documentation after code changes
 - Raise issues for unrelated bugs discovered during work (if permissions allow)
 

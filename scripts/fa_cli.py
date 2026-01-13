@@ -85,29 +85,19 @@ class AppConfig:
 
 
 class TokenStore:
-    def __init__(
-        self, env_path: Path, env_file_data: Dict[str, str], env_lookup: Dict[str, str]
-    ):
+    def __init__(self, env_path: Path, env_file_data: Dict[str, str], env_lookup: Dict[str, str]):
         self.env_path = env_path
         self.env_file_data = env_file_data
         self.env_lookup = env_lookup
 
     def load(self) -> Optional[OAuthTokens]:
-        access = self.env_lookup.get("FREEAGENT_ACCESS_TOKEN") or self.env_lookup.get(
-            "ACCESS_TOKEN"
-        )
-        refresh = self.env_lookup.get("FREEAGENT_REFRESH_TOKEN") or self.env_lookup.get(
-            "REFRESH_TOKEN"
-        )
-        expires_at_raw = self.env_lookup.get(
-            "FREEAGENT_EXPIRES_AT"
-        ) or self.env_lookup.get("EXPIRES_AT")
+        access = self.env_lookup.get("FREEAGENT_ACCESS_TOKEN") or self.env_lookup.get("ACCESS_TOKEN")
+        refresh = self.env_lookup.get("FREEAGENT_REFRESH_TOKEN") or self.env_lookup.get("REFRESH_TOKEN")
+        expires_at_raw = self.env_lookup.get("FREEAGENT_EXPIRES_AT") or self.env_lookup.get("EXPIRES_AT")
         if not access:
             return None
         expires_at = float(expires_at_raw) if expires_at_raw else 0.0
-        return OAuthTokens(
-            access_token=access, refresh_token=refresh or "", expires_at=expires_at
-        )
+        return OAuthTokens(access_token=access, refresh_token=refresh or "", expires_at=expires_at)
 
     def save(self, tokens: OAuthTokens) -> None:
         self.env_file_data["FREEAGENT_ACCESS_TOKEN"] = tokens.access_token
@@ -117,9 +107,7 @@ class TokenStore:
             self.env_lookup["FREEAGENT_REFRESH_TOKEN"] = tokens.refresh_token
         self.env_file_data["FREEAGENT_EXPIRES_AT"] = str(tokens.expires_at)
         self.env_lookup["FREEAGENT_EXPIRES_AT"] = str(tokens.expires_at)
-        lines = [
-            f"{k}={v}" for k, v in sorted(self.env_file_data.items()) if k.isupper()
-        ]
+        lines = [f"{k}={v}" for k, v in sorted(self.env_file_data.items()) if k.isupper()]
         self.env_path.write_text("\n".join(lines) + "\n")
 
 
@@ -219,9 +207,7 @@ def refresh_access_token(config: AppConfig, tokens: OAuthTokens) -> OAuthTokens:
 
 
 def _token_request(config: AppConfig, payload: Dict[str, Any]) -> OAuthTokens:
-    auth_basic = base64.b64encode(
-        f"{config.oauth_id}:{config.oauth_secret}".encode()
-    ).decode()
+    auth_basic = base64.b64encode(f"{config.oauth_id}:{config.oauth_secret}".encode()).decode()
     headers = {
         "Authorization": f"Basic {auth_basic}",
         "Content-Type": "application/x-www-form-urlencoded",
@@ -230,9 +216,7 @@ def _token_request(config: AppConfig, payload: Dict[str, Any]) -> OAuthTokens:
 
     if resp.status_code >= 400:
         debug_lines: List[str] = []
-        debug_lines.append(
-            f"grant_type={payload.get('grant_type')}, redirect_uri={payload.get('redirect_uri')}"
-        )
+        debug_lines.append(f"grant_type={payload.get('grant_type')}, redirect_uri={payload.get('redirect_uri')}")
         debug_lines.append(f"status={resp.status_code} {resp.reason}")
         www_auth = resp.headers.get("WWW-Authenticate")
         if www_auth:
@@ -243,17 +227,11 @@ def _token_request(config: AppConfig, payload: Dict[str, Any]) -> OAuthTokens:
         detail = " | ".join(debug_lines)
         raise SystemExit(
             "Token request failed. Check credentials and redirect URI. "
-            + (
-                detail
-                if config.debug
-                else f"Status {resp.status_code}. Enable --debug for details."
-            )
+            + (detail if config.debug else f"Status {resp.status_code}. Enable --debug for details.")
         )
 
     if config.debug:
-        print(
-            f"Token request succeeded: status={resp.status_code} content-type={resp.headers.get('Content-Type')}"
-        )
+        print(f"Token request succeeded: status={resp.status_code} content-type={resp.headers.get('Content-Type')}")
 
     data = resp.json()
     return OAuthTokens.from_response(data)
@@ -269,11 +247,7 @@ class _AuthHandler(BaseHTTPRequestHandler):
         state = params.get("state", [None])[0]
         self.server.auth_code = code  # type: ignore[attr-defined]
         self.server.auth_state = state  # type: ignore[attr-defined]
-        msg = (
-            "Authorization received. You may close this window."
-            if code
-            else "Authorization failed."
-        )
+        msg = "Authorization received. You may close this window." if code else "Authorization failed."
         self.send_response(200)
         self.end_headers()
         self.wfile.write(msg.encode())
@@ -393,10 +367,7 @@ def api_request(
         )
 
     if resp.status_code >= 400:
-        raise SystemExit(
-            f"API error {resp.status_code}: {resp.text}. "
-            f"Path={path}, params={params}"
-        )
+        raise SystemExit(f"API error {resp.status_code}: {resp.text}. " f"Path={path}, params={params}")
     return resp
 
 
@@ -425,15 +396,11 @@ def paginate_get(
         page += 1
 
 
-def _project_fields(
-    rows: List[Dict[str, Any]], fields: List[str]
-) -> List[Dict[str, Any]]:
+def _project_fields(rows: List[Dict[str, Any]], fields: List[str]) -> List[Dict[str, Any]]:
     return [{k: row.get(k, "") for k in fields} for row in rows]
 
 
-def format_output(
-    rows: List[Dict[str, Any]], fields: List[str], output_format: str
-) -> str:
+def format_output(rows: List[Dict[str, Any]], fields: List[str], output_format: str) -> str:
     projected = _project_fields(rows, fields)
 
     if output_format == "csv":
@@ -472,14 +439,10 @@ def parse_json_body(raw: str) -> Dict[str, Any]:
 def handle_auth(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     tokens = start_auth_flow(config, args.port, not args.no_browser)
     store.save(tokens)
-    print(
-        f"Tokens saved to {store.env_path}. Try: uv run scripts/fa_cli.py invoices list"
-    )
+    print(f"Tokens saved to {store.env_path}. Try: uv run scripts/fa_cli.py invoices list")
 
 
-def handle_bank_accounts_list(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_bank_accounts_list(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     params = {"per_page": args.per_page, "page": args.page}
     rows = list(
         paginate_get(
@@ -495,9 +458,7 @@ def handle_bank_accounts_list(
     print(format_output(rows, fields, args.format))
 
 
-def handle_bank_feeds_list(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_bank_feeds_list(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     params = {"per_page": args.per_page, "page": args.page}
     rows = list(
         paginate_get(
@@ -522,9 +483,7 @@ def handle_bank_feeds_list(
     print(format_output(rows, fields, args.format))
 
 
-def handle_bank_feeds_get(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_bank_feeds_get(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     resp = api_request("GET", config, store, f"/bank_feeds/{args.id}")
     feed = resp.json().get("bank_feed", {})
     fields = [
@@ -540,9 +499,7 @@ def handle_bank_feeds_get(
     print(format_output([feed], fields, args.format))
 
 
-def handle_contacts_list(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_contacts_list(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     params = {
         "view": args.view,
         "search": args.search,
@@ -565,9 +522,7 @@ def handle_contacts_list(
     print(format_output(rows, fields, args.format))
 
 
-def handle_contacts_get(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_contacts_get(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     resp = api_request("GET", config, store, f"/contacts/{args.id}")
     contact = resp.json().get("contact", {})
     fields = [
@@ -591,9 +546,7 @@ def handle_contacts_get(
     print(format_output([contact], fields, args.format))
 
 
-def handle_contacts_update(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_contacts_update(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     body = parse_json_body(args.body)
     if args.dry_run:
         print(json.dumps(body, indent=2))
@@ -602,9 +555,7 @@ def handle_contacts_update(
     print(json.dumps(resp.json(), indent=2))
 
 
-def handle_expenses_list(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_expenses_list(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     params = {
         "view": args.view,
         "from_date": args.from_date,
@@ -629,9 +580,7 @@ def handle_expenses_list(
     print(format_output(rows, fields, args.format))
 
 
-def handle_payroll_list_periods(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_payroll_list_periods(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     path = f"/payroll/{args.year}"
     resp = api_request("GET", config, store, path)
     periods = resp.json().get("periods", [])
@@ -639,9 +588,7 @@ def handle_payroll_list_periods(
     print(format_output(periods, fields, args.format))
 
 
-def handle_payroll_list_payslips(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_payroll_list_payslips(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     path = f"/payroll/{args.year}/{args.period}"
     resp = api_request("GET", config, store, path)
     period = resp.json().get("period", {})
@@ -659,9 +606,7 @@ def handle_payroll_list_payslips(
     print(format_output(payslips, fields, args.format))
 
 
-def handle_company_info(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_company_info(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     resp = api_request("GET", config, store, "/company")
     company = resp.json().get("company", {})
     fields = [
@@ -683,32 +628,24 @@ def handle_company_info(
     print(format_output([company], fields, args.format))
 
 
-def handle_company_business_categories(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_company_business_categories(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     resp = api_request("GET", config, store, "/company/business_categories")
     categories = resp.json().get("business_categories", [])
     rows = [{"business_category": name} for name in categories]
     print(format_output(rows, ["business_category"], args.format))
 
 
-def handle_company_tax_timeline(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_company_tax_timeline(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     resp = api_request("GET", config, store, "/company/tax_timeline")
     items = resp.json().get("timeline_items", [])
     fields = ["description", "nature", "dated_on", "amount_due", "is_personal"]
     print(format_output(items, fields, args.format))
 
 
-def handle_capital_assets_list(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_capital_assets_list(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     params = {
         "view": args.view,
-        "include_history": (
-            str(args.include_history).lower() if args.include_history else None
-        ),
+        "include_history": (str(args.include_history).lower() if args.include_history else None),
         "per_page": args.per_page,
         "page": args.page,
     }
@@ -738,18 +675,10 @@ def handle_capital_assets_list(
     print(format_output(rows, fields, args.format))
 
 
-def handle_capital_assets_get(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
-    params = {
-        "include_history": (
-            str(args.include_history).lower() if args.include_history else None
-        )
-    }
+def handle_capital_assets_get(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
+    params = {"include_history": (str(args.include_history).lower() if args.include_history else None)}
     params = {k: v for k, v in params.items() if v not in (None, "")}
-    resp = api_request(
-        "GET", config, store, f"/capital_assets/{args.id}", params=params
-    )
+    resp = api_request("GET", config, store, f"/capital_assets/{args.id}", params=params)
     asset = resp.json().get("capital_asset", {})
     fields = [
         "url",
@@ -766,9 +695,7 @@ def handle_capital_assets_get(
     print(format_output([asset], fields, args.format))
 
 
-def handle_capital_assets_create(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_capital_assets_create(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     body = parse_json_body(args.body)
     if args.dry_run:
         print(json.dumps(body, indent=2))
@@ -777,22 +704,16 @@ def handle_capital_assets_create(
     print(json.dumps(resp.json(), indent=2))
 
 
-def handle_capital_assets_update(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_capital_assets_update(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     body = parse_json_body(args.body)
     if args.dry_run:
         print(json.dumps(body, indent=2))
         return
-    resp = api_request(
-        "PUT", config, store, f"/capital_assets/{args.id}", json_body=body
-    )
+    resp = api_request("PUT", config, store, f"/capital_assets/{args.id}", json_body=body)
     print(json.dumps(resp.json(), indent=2))
 
 
-def handle_capital_assets_delete(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_capital_assets_delete(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     if args.dry_run:
         print(f"[dry-run] Would delete capital asset {args.id}")
         return
@@ -800,9 +721,7 @@ def handle_capital_assets_delete(
     print(f"Deleted capital asset {args.id}")
 
 
-def handle_capital_asset_types_list(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_capital_asset_types_list(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     params = {"per_page": args.per_page, "page": args.page}
     rows = list(
         paginate_get(
@@ -818,18 +737,14 @@ def handle_capital_asset_types_list(
     print(format_output(rows, fields, args.format))
 
 
-def handle_capital_asset_types_get(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_capital_asset_types_get(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     resp = api_request("GET", config, store, f"/capital_asset_types/{args.id}")
     asset_type = resp.json().get("capital_asset_type", {})
     fields = ["url", "name", "system_default", "created_at", "updated_at"]
     print(format_output([asset_type], fields, args.format))
 
 
-def handle_capital_asset_types_create(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_capital_asset_types_create(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     body = parse_json_body(args.body)
     if args.dry_run:
         print(json.dumps(body, indent=2))
@@ -838,22 +753,16 @@ def handle_capital_asset_types_create(
     print(json.dumps(resp.json(), indent=2))
 
 
-def handle_capital_asset_types_update(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_capital_asset_types_update(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     body = parse_json_body(args.body)
     if args.dry_run:
         print(json.dumps(body, indent=2))
         return
-    resp = api_request(
-        "PUT", config, store, f"/capital_asset_types/{args.id}", json_body=body
-    )
+    resp = api_request("PUT", config, store, f"/capital_asset_types/{args.id}", json_body=body)
     print(json.dumps(resp.json(), indent=2))
 
 
-def handle_capital_asset_types_delete(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_capital_asset_types_delete(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     if args.dry_run:
         print(f"[dry-run] Would delete capital asset type {args.id}")
         return
@@ -861,9 +770,7 @@ def handle_capital_asset_types_delete(
     print(f"Deleted capital asset type {args.id}")
 
 
-def handle_users_list(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_users_list(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     params = {
         "view": args.view,
         "per_page": args.per_page,
@@ -894,9 +801,7 @@ def handle_users_list(
     print(format_output(rows, fields, args.format))
 
 
-def handle_users_get(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_users_get(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     path = "/users/me" if args.id == "me" else f"/users/{args.id}"
     resp = api_request("GET", config, store, path)
     user = resp.json().get("user", {})
@@ -914,15 +819,11 @@ def handle_users_get(
     print(format_output([user], fields, args.format))
 
 
-def handle_users_me(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_users_me(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     handle_users_get(argparse.Namespace(id="me", format=args.format), config, store)
 
 
-def handle_users_delete(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_users_delete(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     if args.dry_run:
         print(f"[dry-run] Would delete user {args.id}")
         return
@@ -930,9 +831,7 @@ def handle_users_delete(
     print(f"Deleted user {args.id}")
 
 
-def handle_users_update_permission(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_users_update_permission(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     body = {"user": {"permission_level": args.permission_level}}
     if args.dry_run:
         print(json.dumps(body, indent=2))
@@ -941,17 +840,13 @@ def handle_users_update_permission(
     print(json.dumps(resp.json(), indent=2))
 
 
-def handle_users_permission(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_users_permission(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     resp = api_request("GET", config, store, f"/users/{args.id}")
     user = resp.json().get("user", {})
     print(json.dumps({"permission_level": user.get("permission_level")}, indent=2))
 
 
-def handle_users_set_hidden(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_users_set_hidden(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     body = {"user": {"hidden": args.hidden}}
     if args.dry_run:
         print(json.dumps(body, indent=2))
@@ -960,9 +855,7 @@ def handle_users_set_hidden(
     print(json.dumps(resp.json(), indent=2))
 
 
-def handle_timeslips_list(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_timeslips_list(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     params = {
         "user": args.user,
         "project": args.project,
@@ -998,9 +891,7 @@ def handle_timeslips_list(
     print(format_output(rows, fields, args.format))
 
 
-def handle_timeslips_delete(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_timeslips_delete(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     if args.dry_run:
         print(f"[dry-run] Would delete timeslip {args.id}")
         return
@@ -1008,9 +899,7 @@ def handle_timeslips_delete(
     print(f"Deleted timeslip {args.id}")
 
 
-def handle_final_accounts_list(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_final_accounts_list(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     params = {"per_page": args.per_page, "page": args.page}
     rows = list(
         paginate_get(
@@ -1034,12 +923,8 @@ def handle_final_accounts_list(
     print(format_output(rows, fields, args.format))
 
 
-def handle_final_accounts_get(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
-    resp = api_request(
-        "GET", config, store, f"/final_accounts_reports/{args.period_ends_on}"
-    )
+def handle_final_accounts_get(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
+    resp = api_request("GET", config, store, f"/final_accounts_reports/{args.period_ends_on}")
     report = resp.json().get("final_accounts_report", {})
     fields = [
         "url",
@@ -1053,25 +938,19 @@ def handle_final_accounts_get(
     print(format_output([report], fields, args.format))
 
 
-def handle_final_accounts_mark_as_filed(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_final_accounts_mark_as_filed(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     path = f"/final_accounts_reports/{args.period_ends_on}/mark_as_filed"
     resp = api_request("PUT", config, store, path)
     print(json.dumps(resp.json(), indent=2))
 
 
-def handle_final_accounts_mark_as_unfiled(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_final_accounts_mark_as_unfiled(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     path = f"/final_accounts_reports/{args.period_ends_on}/mark_as_unfiled"
     resp = api_request("PUT", config, store, path)
     print(json.dumps(resp.json(), indent=2))
 
 
-def handle_projects_list(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_projects_list(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     params = {
         "view": args.view,
         "updated_since": args.updated_since,
@@ -1104,9 +983,7 @@ def handle_projects_list(
     print(format_output(rows, fields, args.format))
 
 
-def handle_projects_get(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_projects_get(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     resp = api_request("GET", config, store, f"/projects/{args.id}")
     project = resp.json().get("project", {})
     fields = [
@@ -1124,9 +1001,7 @@ def handle_projects_get(
     print(format_output([project], fields, args.format))
 
 
-def handle_bank_transactions_list(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_bank_transactions_list(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     params = {
         "bank_account": args.bank_account,
         "from_date": args.from_date,
@@ -1157,9 +1032,7 @@ def handle_bank_transactions_list(
     print(format_output(rows, fields, args.format))
 
 
-def handle_bank_transaction_explanations_list(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_bank_transaction_explanations_list(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     params = {
         "bank_account": args.bank_account,
         "from_date": args.from_date,
@@ -1197,18 +1070,12 @@ def handle_bank_transaction_explanations_list(
         "updated_at",
     ]
     if getattr(args, "for_approval", False):
-        rows = [
-            r for r in rows if str(r.get("marked_for_review", "")).lower() == "true"
-        ]
+        rows = [r for r in rows if str(r.get("marked_for_review", "")).lower() == "true"]
     print(format_output(rows, fields, args.format))
 
 
-def handle_bank_transaction_explanations_get(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
-    resp = api_request(
-        "GET", config, store, f"/bank_transaction_explanations/{args.id}"
-    )
+def handle_bank_transaction_explanations_get(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
+    resp = api_request("GET", config, store, f"/bank_transaction_explanations/{args.id}")
     explanation = resp.json().get("bank_transaction_explanation", {})
     fields = [
         "url",
@@ -1229,9 +1096,7 @@ def handle_bank_transaction_explanations_get(
     print(format_output([explanation], fields, args.format))
 
 
-def handle_bank_transaction_explanations_create(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_bank_transaction_explanations_create(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     body = parse_json_body(args.body)
     if args.dry_run:
         print(json.dumps(body, indent=2))
@@ -1246,9 +1111,7 @@ def handle_bank_transaction_explanations_create(
     print(json.dumps(resp.json(), indent=2))
 
 
-def handle_bank_transaction_explanations_update(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_bank_transaction_explanations_update(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     body = parse_json_body(args.body)
     if args.dry_run:
         print(json.dumps(body, indent=2))
@@ -1263,9 +1126,7 @@ def handle_bank_transaction_explanations_update(
     print(json.dumps(resp.json(), indent=2))
 
 
-def handle_bank_transaction_explanations_delete(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_bank_transaction_explanations_delete(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     if args.dry_run:
         print(f"[dry-run] Would delete bank transaction explanation {args.id}")
         return
@@ -1297,9 +1158,7 @@ def handle_bank_transaction_explanations_approve(
         print(json.dumps(resp.json(), indent=2))
 
 
-def handle_transactions_list(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_transactions_list(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     params = {
         "from_date": args.from_date,
         "to_date": args.to_date,
@@ -1334,9 +1193,7 @@ def handle_transactions_list(
     print(format_output(rows, fields, args.format))
 
 
-def handle_transactions_get(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_transactions_get(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     resp = api_request("GET", config, store, f"/accounting/transactions/{args.id}")
     transaction = resp.json().get("transaction", {})
     fields = [
@@ -1355,9 +1212,7 @@ def handle_transactions_get(
     print(format_output([transaction], fields, args.format))
 
 
-def handle_journal_sets_list(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_journal_sets_list(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     params = {
         "from_date": args.from_date,
         "to_date": args.to_date,
@@ -1381,9 +1236,7 @@ def handle_journal_sets_list(
     print(format_output(rows, fields, args.format))
 
 
-def handle_journal_sets_get(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_journal_sets_get(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     resp = api_request("GET", config, store, f"/journal_sets/{args.id}")
     journal_set = resp.json().get("journal_set", {})
     fields = [
@@ -1399,9 +1252,7 @@ def handle_journal_sets_get(
     print(format_output([journal_set], fields, args.format))
 
 
-def handle_journal_sets_opening_balances(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_journal_sets_opening_balances(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     resp = api_request("GET", config, store, "/journal_sets/opening_balances")
     journal_set = resp.json().get("journal_set", {})
     fields = [
@@ -1417,9 +1268,7 @@ def handle_journal_sets_opening_balances(
     print(format_output([journal_set], fields, args.format))
 
 
-def handle_journal_sets_create(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_journal_sets_create(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     body = parse_json_body(args.body)
     if args.dry_run:
         print(json.dumps(body, indent=2))
@@ -1428,9 +1277,7 @@ def handle_journal_sets_create(
     print(json.dumps(resp.json(), indent=2))
 
 
-def handle_journal_sets_update(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_journal_sets_update(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     body = parse_json_body(args.body)
     if args.dry_run:
         print(json.dumps(body, indent=2))
@@ -1445,9 +1292,7 @@ def handle_journal_sets_update(
     print(json.dumps(resp.json(), indent=2))
 
 
-def handle_journal_sets_delete(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_journal_sets_delete(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     if args.dry_run:
         print(f"[dry-run] Would delete journal set {args.id}")
         return
@@ -1455,9 +1300,7 @@ def handle_journal_sets_delete(
     print(f"Deleted journal set {args.id}")
 
 
-def handle_attachments_list(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_attachments_list(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     params = {
         "attachable_type": args.attachable_type,
         "attachable_id": args.attachable_id,
@@ -1487,9 +1330,7 @@ def handle_attachments_list(
     print(format_output(rows, fields, args.format))
 
 
-def handle_attachments_get(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_attachments_get(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     resp = api_request("GET", config, store, f"/attachments/{args.id}")
     attachment = resp.json().get("attachment", {})
     fields = [
@@ -1506,17 +1347,11 @@ def handle_attachments_get(
     print(format_output([attachment], fields, args.format))
 
 
-def handle_attachments_upload(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_attachments_upload(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     file_path = Path(args.file)
     if not file_path.exists():
         raise SystemExit(f"File not found: {file_path}")
-    content_type = (
-        args.content_type
-        or mimetypes.guess_type(str(file_path))[0]
-        or "application/octet-stream"
-    )
+    content_type = args.content_type or mimetypes.guess_type(str(file_path))[0] or "application/octet-stream"
     file_name = args.file_name or file_path.name
     form_data = {
         "description": args.description,
@@ -1545,9 +1380,7 @@ def handle_attachments_upload(
     print(json.dumps(resp.json(), indent=2))
 
 
-def handle_attachments_delete(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_attachments_delete(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     if args.dry_run:
         print(f"[dry-run] Would delete attachment {args.id}")
         return
@@ -1555,17 +1388,13 @@ def handle_attachments_delete(
     print(f"Deleted attachment {args.id}")
 
 
-def handle_bank_transactions_get(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_bank_transactions_get(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     resp = api_request("GET", config, store, f"/bank_transactions/{args.id}")
     data = resp.json().get("bank_transaction", {})
     print(json.dumps(data, indent=2))
 
 
-def handle_bank_transactions_delete(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_bank_transactions_delete(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     if args.dry_run:
         print(f"[dry-run] Would delete bank transaction {args.id}")
         return
@@ -1573,9 +1402,7 @@ def handle_bank_transactions_delete(
     print(f"Deleted bank transaction {args.id}")
 
 
-def handle_bills_list(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_bills_list(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     params = {
         "view": args.view,
         "from_date": args.from_date,
@@ -1600,9 +1427,7 @@ def handle_bills_list(
     print(format_output(rows, fields, args.format))
 
 
-def handle_bills_list_all(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_bills_list_all(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     params = {"per_page": args.per_page, "page": args.page}
     rows = list(
         paginate_get(
@@ -1618,16 +1443,12 @@ def handle_bills_list_all(
     print(format_output(rows, fields, args.format))
 
 
-def handle_bills_get(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_bills_get(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     resp = api_request("GET", config, store, f"/bills/{args.id}")
     print(json.dumps(resp.json().get("bill", {}), indent=2))
 
 
-def handle_bills_create(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_bills_create(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     body = parse_json_body(args.body)
     if args.dry_run:
         print(json.dumps(body, indent=2))
@@ -1636,9 +1457,7 @@ def handle_bills_create(
     print(json.dumps(resp.json(), indent=2))
 
 
-def handle_bills_update(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_bills_update(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     body = parse_json_body(args.body)
     if args.dry_run:
         print(json.dumps(body, indent=2))
@@ -1647,9 +1466,7 @@ def handle_bills_update(
     print(json.dumps(resp.json(), indent=2))
 
 
-def handle_bills_delete(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_bills_delete(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     if args.dry_run:
         print(f"[dry-run] Would delete bill {args.id}")
         return
@@ -1657,9 +1474,7 @@ def handle_bills_delete(
     print(f"Deleted bill {args.id}")
 
 
-def handle_invoices_list(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_invoices_list(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     params = {
         "view": args.view,
         "updated_since": args.updated_since,
@@ -1691,9 +1506,7 @@ def handle_invoices_list(
     print(format_output(rows, fields, args.format))
 
 
-def handle_invoices_list_all(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_invoices_list_all(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     params = {"per_page": args.per_page, "page": args.page}
     rows = list(
         paginate_get(
@@ -1717,16 +1530,12 @@ def handle_invoices_list_all(
     print(format_output(rows, fields, args.format))
 
 
-def handle_invoices_get(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_invoices_get(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     resp = api_request("GET", config, store, f"/invoices/{args.id}")
     print(json.dumps(resp.json().get("invoice", {}), indent=2))
 
 
-def handle_invoices_create(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_invoices_create(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     body = parse_json_body(args.body)
     if args.dry_run:
         print(json.dumps(body, indent=2))
@@ -1735,9 +1544,7 @@ def handle_invoices_create(
     print(json.dumps(resp.json(), indent=2))
 
 
-def handle_invoices_update(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_invoices_update(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     body = parse_json_body(args.body)
     if args.dry_run:
         print(json.dumps(body, indent=2))
@@ -1746,9 +1553,7 @@ def handle_invoices_update(
     print(json.dumps(resp.json(), indent=2))
 
 
-def handle_invoices_delete(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_invoices_delete(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     if args.dry_run:
         print(f"[dry-run] Would delete invoice {args.id}")
         return
@@ -1756,45 +1561,33 @@ def handle_invoices_delete(
     print(f"Deleted invoice {args.id}")
 
 
-def handle_reports_profit_loss(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_reports_profit_loss(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     params = {
         "from_date": args.from_date,
         "to_date": args.to_date,
         "accounting_period": args.accounting_period,
     }
     params = {k: v for k, v in params.items() if v not in (None, "")}
-    resp = api_request(
-        "GET", config, store, "/accounting/profit_and_loss/summary", params=params
-    )
+    resp = api_request("GET", config, store, "/accounting/profit_and_loss/summary", params=params)
     data = resp.json().get("profit_and_loss_summary", {})
     print(json.dumps(data, indent=2))
 
 
-def handle_reports_balance_sheet(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_reports_balance_sheet(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     params = {"as_at_date": args.as_at_date}
     params = {k: v for k, v in params.items() if v}
     resp = api_request("GET", config, store, "/accounting/balance_sheet", params=params)
     print(json.dumps(resp.json().get("balance_sheet", {}), indent=2))
 
 
-def handle_reports_trial_balance(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_reports_trial_balance(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     params = {"from_date": args.from_date, "to_date": args.to_date}
     params = {k: v for k, v in params.items() if v}
-    resp = api_request(
-        "GET", config, store, "/accounting/trial_balance/summary", params=params
-    )
+    resp = api_request("GET", config, store, "/accounting/trial_balance/summary", params=params)
     print(json.dumps(resp.json().get("trial_balance", {}), indent=2))
 
 
-def handle_cashflow_summary(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_cashflow_summary(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     params = {"from_date": args.from_date, "to_date": args.to_date}
     params = {k: v for k, v in params.items() if v}
     resp = api_request("GET", config, store, "/cashflow", params=params)
@@ -1819,9 +1612,7 @@ def handle_cashflow_summary(
     print(format_output(rows, ["label", "value"], args.format))
 
 
-def handle_notes_list(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_notes_list(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     params = {"contact": args.contact, "project": args.project}
     params = {k: v for k, v in params.items() if v}
     resp = api_request("GET", config, store, "/notes", params=params)
@@ -1830,18 +1621,14 @@ def handle_notes_list(
     print(format_output(notes, fields, args.format))
 
 
-def handle_notes_get(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_notes_get(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     resp = api_request("GET", config, store, f"/notes/{args.id}")
     note = resp.json().get("note", {})
     fields = ["url", "note", "parent_url", "author", "created_at", "updated_at"]
     print(format_output([note], fields, args.format))
 
 
-def handle_notes_create(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_notes_create(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     params = {"contact": args.contact, "project": args.project}
     params = {k: v for k, v in params.items() if v}
     body = parse_json_body(args.body)
@@ -1852,9 +1639,7 @@ def handle_notes_create(
     print(json.dumps(resp.json(), indent=2))
 
 
-def handle_notes_update(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_notes_update(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     body = parse_json_body(args.body)
     if args.dry_run:
         print(json.dumps(body, indent=2))
@@ -1863,9 +1648,7 @@ def handle_notes_update(
     print(json.dumps(resp.json(), indent=2))
 
 
-def handle_notes_delete(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_notes_delete(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     if args.dry_run:
         print(f"[dry-run] Would delete note {args.id}")
         return
@@ -1873,9 +1656,7 @@ def handle_notes_delete(
     print(f"Deleted note {args.id}")
 
 
-def handle_depreciation_profiles_methods(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_depreciation_profiles_methods(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     rows = [
         {
             "method": "straight_line",
@@ -1897,9 +1678,7 @@ def handle_depreciation_profiles_methods(
     print(format_output(rows, fields, args.format))
 
 
-def handle_depreciation_profiles_build(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_depreciation_profiles_build(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     method = args.method
     profile: Dict[str, Any] = {"method": method}
 
@@ -1914,9 +1693,7 @@ def handle_depreciation_profiles_build(
         profile["asset_life_years"] = args.asset_life_years
     elif method == "reducing_balance":
         if args.annual_depreciation_percentage is None:
-            raise SystemExit(
-                "--annual-depreciation-percentage is required for reducing_balance"
-            )
+            raise SystemExit("--annual-depreciation-percentage is required for reducing_balance")
         if not 1 <= args.annual_depreciation_percentage <= 99:
             raise SystemExit("annual depreciation percentage must be between 1 and 99")
         profile["annual_depreciation_percentage"] = args.annual_depreciation_percentage
@@ -1924,9 +1701,7 @@ def handle_depreciation_profiles_build(
         if args.asset_life_years is not None:
             raise SystemExit("--asset-life-years is not used for no_depreciation")
         if args.annual_depreciation_percentage is not None:
-            raise SystemExit(
-                "--annual-depreciation-percentage is not used for no_depreciation"
-            )
+            raise SystemExit("--annual-depreciation-percentage is not used for no_depreciation")
 
     payload = {"capital_asset": {"depreciation_profile": profile}}
 
@@ -1939,9 +1714,7 @@ def handle_depreciation_profiles_build(
     print(json.dumps(payload, indent=2))
 
 
-def handle_sales_tax_moss_rates(
-    args: argparse.Namespace, config: AppConfig, store: TokenStore
-) -> None:
+def handle_sales_tax_moss_rates(args: argparse.Namespace, config: AppConfig, store: TokenStore) -> None:
     params = {"country": args.country, "date": args.date}
     resp = api_request("GET", config, store, "/ec_moss/sales_tax_rates", params=params)
     rates = resp.json().get("sales_tax_rates", [])
@@ -1969,9 +1742,7 @@ def build_parser() -> argparse.ArgumentParser:
         default=str(DEFAULT_ENV_FILE),
         help="Path to .env file (default: .env)",
     )
-    parser.add_argument(
-        "--base-url", default=API_BASE_URL, help="Override API base URL"
-    )
+    parser.add_argument("--base-url", default=API_BASE_URL, help="Override API base URL")
     parser.add_argument(
         "--format",
         default="plain",
@@ -1979,12 +1750,8 @@ def build_parser() -> argparse.ArgumentParser:
         help="Output format for list commands",
     )
     parser.add_argument("--page", type=int, default=1, help="Pagination start page")
-    parser.add_argument(
-        "--per-page", type=int, default=PAGE_MAX, help="Items per page (max 100)"
-    )
-    parser.add_argument(
-        "--debug", action="store_true", help="Print verbose debug output for HTTP calls"
-    )
+    parser.add_argument("--per-page", type=int, default=PAGE_MAX, help="Items per page (max 100)")
+    parser.add_argument("--debug", action="store_true", help="Print verbose debug output for HTTP calls")
     parser.add_argument(
         "--max-pages",
         type=int,
@@ -2002,12 +1769,8 @@ def build_parser() -> argparse.ArgumentParser:
 
     # Auth
     auth_p = subparsers.add_parser("auth", help="Run OAuth flow and cache tokens")
-    auth_p.add_argument(
-        "--port", type=int, default=8888, help="Local port for OAuth callback"
-    )
-    auth_p.add_argument(
-        "--no-browser", action="store_true", help="Do not auto-open the browser"
-    )
+    auth_p.add_argument("--port", type=int, default=8888, help="Local port for OAuth callback")
+    auth_p.add_argument("--no-browser", action="store_true", help="Do not auto-open the browser")
     auth_p.set_defaults(func=handle_auth)
 
     # Bank accounts
@@ -2042,13 +1805,9 @@ def build_parser() -> argparse.ArgumentParser:
     contacts_get.add_argument("id", help="Contact ID")
     contacts_get.set_defaults(func=handle_contacts_get)
 
-    contacts_update = contacts_sub.add_parser(
-        "update", help="Update a contact from JSON body"
-    )
+    contacts_update = contacts_sub.add_parser("update", help="Update a contact from JSON body")
     contacts_update.add_argument("id", help="Contact ID")
-    contacts_update.add_argument(
-        "--body", required=True, help='JSON payload: {"contact": {...}}'
-    )
+    contacts_update.add_argument("--body", required=True, help='JSON payload: {"contact": {...}}')
     contacts_update.add_argument(
         "--dry-run",
         action="store_true",
@@ -2061,14 +1820,10 @@ def build_parser() -> argparse.ArgumentParser:
     expenses_sub = expenses.add_subparsers(dest="action", required=True)
 
     expenses_list = expenses_sub.add_parser("list", help="List expenses")
-    expenses_list.add_argument(
-        "--view", choices=["recent", "recurring"], help="View filter"
-    )
+    expenses_list.add_argument("--view", choices=["recent", "recurring"], help="View filter")
     expenses_list.add_argument("--from-date", help="Filter from date (YYYY-MM-DD)")
     expenses_list.add_argument("--to-date", help="Filter to date (YYYY-MM-DD)")
-    expenses_list.add_argument(
-        "--updated-since", help="Filter by updated_since timestamp"
-    )
+    expenses_list.add_argument("--updated-since", help="Filter by updated_since timestamp")
     expenses_list.add_argument("--project", help="Project URL to filter by project")
     expenses_list.set_defaults(func=handle_expenses_list)
 
@@ -2076,23 +1831,13 @@ def build_parser() -> argparse.ArgumentParser:
     payroll = subparsers.add_parser("payroll", help="Payroll operations")
     payroll_sub = payroll.add_subparsers(dest="action", required=True)
 
-    payroll_periods = payroll_sub.add_parser(
-        "list-periods", help="List payroll periods for a tax year"
-    )
-    payroll_periods.add_argument(
-        "--year", required=True, type=int, help="Payroll tax year end (e.g. 2026)"
-    )
+    payroll_periods = payroll_sub.add_parser("list-periods", help="List payroll periods for a tax year")
+    payroll_periods.add_argument("--year", required=True, type=int, help="Payroll tax year end (e.g. 2026)")
     payroll_periods.set_defaults(func=handle_payroll_list_periods)
 
-    payroll_payslips = payroll_sub.add_parser(
-        "list-payslips", help="List payslips for a payroll period"
-    )
-    payroll_payslips.add_argument(
-        "--year", required=True, type=int, help="Payroll tax year end (e.g. 2026)"
-    )
-    payroll_payslips.add_argument(
-        "--period", required=True, type=int, help="Payroll period number (0-11)"
-    )
+    payroll_payslips = payroll_sub.add_parser("list-payslips", help="List payslips for a payroll period")
+    payroll_payslips.add_argument("--year", required=True, type=int, help="Payroll tax year end (e.g. 2026)")
+    payroll_payslips.add_argument("--period", required=True, type=int, help="Payroll period number (0-11)")
     payroll_payslips.set_defaults(func=handle_payroll_list_payslips)
 
     # Company
@@ -2102,20 +1847,14 @@ def build_parser() -> argparse.ArgumentParser:
     company_info = company_sub.add_parser("info", help="Show company information")
     company_info.set_defaults(func=handle_company_info)
 
-    company_categories = company_sub.add_parser(
-        "business-categories", help="List all business categories"
-    )
+    company_categories = company_sub.add_parser("business-categories", help="List all business categories")
     company_categories.set_defaults(func=handle_company_business_categories)
 
-    company_timeline = company_sub.add_parser(
-        "tax-timeline", help="Show upcoming tax events"
-    )
+    company_timeline = company_sub.add_parser("tax-timeline", help="Show upcoming tax events")
     company_timeline.set_defaults(func=handle_company_tax_timeline)
 
     # Capital assets
-    capital_assets = subparsers.add_parser(
-        "capital-assets", help="Capital asset operations"
-    )
+    capital_assets = subparsers.add_parser("capital-assets", help="Capital asset operations")
     ca_sub = capital_assets.add_subparsers(dest="action", required=True)
 
     ca_list = ca_sub.add_parser("list", help="List capital assets")
@@ -2140,12 +1879,8 @@ def build_parser() -> argparse.ArgumentParser:
     )
     ca_get.set_defaults(func=handle_capital_assets_get)
 
-    ca_create = ca_sub.add_parser(
-        "create", help="Create a capital asset from JSON body"
-    )
-    ca_create.add_argument(
-        "--body", required=True, help='JSON payload: {"capital_asset": {...}}'
-    )
+    ca_create = ca_sub.add_parser("create", help="Create a capital asset from JSON body")
+    ca_create.add_argument("--body", required=True, help='JSON payload: {"capital_asset": {...}}')
     ca_create.add_argument(
         "--dry-run",
         action="store_true",
@@ -2153,16 +1888,10 @@ def build_parser() -> argparse.ArgumentParser:
     )
     ca_create.set_defaults(func=handle_capital_assets_create)
 
-    ca_update = ca_sub.add_parser(
-        "update", help="Update a capital asset from JSON body"
-    )
+    ca_update = ca_sub.add_parser("update", help="Update a capital asset from JSON body")
     ca_update.add_argument("id", help="Capital asset ID")
-    ca_update.add_argument(
-        "--body", required=True, help='JSON payload: {"capital_asset": {...}}'
-    )
-    ca_update.add_argument(
-        "--dry-run", action="store_true", help="Preview update without calling the API"
-    )
+    ca_update.add_argument("--body", required=True, help='JSON payload: {"capital_asset": {...}}')
+    ca_update.add_argument("--dry-run", action="store_true", help="Preview update without calling the API")
     ca_update.set_defaults(func=handle_capital_assets_update)
 
     ca_delete = ca_sub.add_parser("delete", help="Delete a capital asset")
@@ -2175,9 +1904,7 @@ def build_parser() -> argparse.ArgumentParser:
     ca_delete.set_defaults(func=handle_capital_assets_delete)
 
     # Capital asset types
-    cat = subparsers.add_parser(
-        "capital-asset-types", help="Capital asset type operations"
-    )
+    cat = subparsers.add_parser("capital-asset-types", help="Capital asset type operations")
     cat_sub = cat.add_subparsers(dest="action", required=True)
 
     cat_list = cat_sub.add_parser("list", help="List capital asset types")
@@ -2187,12 +1914,8 @@ def build_parser() -> argparse.ArgumentParser:
     cat_get.add_argument("id", help="Capital asset type ID")
     cat_get.set_defaults(func=handle_capital_asset_types_get)
 
-    cat_create = cat_sub.add_parser(
-        "create", help="Create a capital asset type from JSON body"
-    )
-    cat_create.add_argument(
-        "--body", required=True, help='JSON payload: {"capital_asset_type": {...}}'
-    )
+    cat_create = cat_sub.add_parser("create", help="Create a capital asset type from JSON body")
+    cat_create.add_argument("--body", required=True, help='JSON payload: {"capital_asset_type": {...}}')
     cat_create.add_argument(
         "--dry-run",
         action="store_true",
@@ -2200,16 +1923,10 @@ def build_parser() -> argparse.ArgumentParser:
     )
     cat_create.set_defaults(func=handle_capital_asset_types_create)
 
-    cat_update = cat_sub.add_parser(
-        "update", help="Update a capital asset type from JSON body"
-    )
+    cat_update = cat_sub.add_parser("update", help="Update a capital asset type from JSON body")
     cat_update.add_argument("id", help="Capital asset type ID")
-    cat_update.add_argument(
-        "--body", required=True, help='JSON payload: {"capital_asset_type": {...}}'
-    )
-    cat_update.add_argument(
-        "--dry-run", action="store_true", help="Preview update without calling the API"
-    )
+    cat_update.add_argument("--body", required=True, help='JSON payload: {"capital_asset_type": {...}}')
+    cat_update.add_argument("--dry-run", action="store_true", help="Preview update without calling the API")
     cat_update.set_defaults(func=handle_capital_asset_types_update)
 
     cat_delete = cat_sub.add_parser("delete", help="Delete a capital asset type")
@@ -2222,19 +1939,13 @@ def build_parser() -> argparse.ArgumentParser:
     cat_delete.set_defaults(func=handle_capital_asset_types_delete)
 
     # Depreciation profiles (helper; no dedicated API endpoint)
-    dep = subparsers.add_parser(
-        "depreciation-profiles", help="Helpers for depreciation_profile payloads"
-    )
+    dep = subparsers.add_parser("depreciation-profiles", help="Helpers for depreciation_profile payloads")
     dep_sub = dep.add_subparsers(dest="action", required=True)
 
-    dep_methods = dep_sub.add_parser(
-        "methods", help="List valid depreciation methods and required parameters"
-    )
+    dep_methods = dep_sub.add_parser("methods", help="List valid depreciation methods and required parameters")
     dep_methods.set_defaults(func=handle_depreciation_profiles_methods)
 
-    dep_build = dep_sub.add_parser(
-        "build", help="Build a depreciation_profile payload for capital assets"
-    )
+    dep_build = dep_sub.add_parser("build", help="Build a depreciation_profile payload for capital assets")
     dep_build.add_argument(
         "--method",
         required=True,
@@ -2286,9 +1997,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     users_delete.set_defaults(func=handle_users_delete)
 
-    users_perm = users_sub.add_parser(
-        "set-permission", help="Update a user's permission level"
-    )
+    users_perm = users_sub.add_parser("set-permission", help="Update a user's permission level")
     users_perm.add_argument("id", help="User ID")
     users_perm.add_argument(
         "--permission-level",
@@ -2297,14 +2006,10 @@ def build_parser() -> argparse.ArgumentParser:
         choices=list(range(0, 9)),
         help="Permission level 0-8 (see FreeAgent docs)",
     )
-    users_perm.add_argument(
-        "--dry-run", action="store_true", help="Preview update without calling the API"
-    )
+    users_perm.add_argument("--dry-run", action="store_true", help="Preview update without calling the API")
     users_perm.set_defaults(func=handle_users_update_permission)
 
-    users_perm_get = users_sub.add_parser(
-        "get-permission", help="Show a user's permission level"
-    )
+    users_perm_get = users_sub.add_parser("get-permission", help="Show a user's permission level")
     users_perm_get.add_argument("id", help="User ID")
     users_perm_get.set_defaults(func=handle_users_permission)
 
@@ -2316,9 +2021,7 @@ def build_parser() -> argparse.ArgumentParser:
         choices=["true", "false"],
         help="Set hidden flag (true|false)",
     )
-    users_hide.add_argument(
-        "--dry-run", action="store_true", help="Preview update without calling the API"
-    )
+    users_hide.add_argument("--dry-run", action="store_true", help="Preview update without calling the API")
     users_hide.set_defaults(
         func=lambda a, c, s: handle_users_set_hidden(
             argparse.Namespace(
@@ -2369,15 +2072,11 @@ def build_parser() -> argparse.ArgumentParser:
     fa_get.add_argument("period_ends_on", help="Period end date (YYYY-MM-DD)")
     fa_get.set_defaults(func=handle_final_accounts_get)
 
-    fa_mark_filed = fa_sub.add_parser(
-        "mark-filed", help="Mark a final accounts report as filed"
-    )
+    fa_mark_filed = fa_sub.add_parser("mark-filed", help="Mark a final accounts report as filed")
     fa_mark_filed.add_argument("period_ends_on", help="Period end date (YYYY-MM-DD)")
     fa_mark_filed.set_defaults(func=handle_final_accounts_mark_as_filed)
 
-    fa_mark_unfiled = fa_sub.add_parser(
-        "mark-unfiled", help="Mark a final accounts report as unfiled"
-    )
+    fa_mark_unfiled = fa_sub.add_parser("mark-unfiled", help="Mark a final accounts report as unfiled")
     fa_mark_unfiled.add_argument("period_ends_on", help="Period end date (YYYY-MM-DD)")
     fa_mark_unfiled.set_defaults(func=handle_final_accounts_mark_as_unfiled)
 
@@ -2391,9 +2090,7 @@ def build_parser() -> argparse.ArgumentParser:
         choices=["active", "completed", "all"],
         help="Filter projects by status",
     )
-    projects_list.add_argument(
-        "--updated-since", help="Filter by updated_since timestamp"
-    )
+    projects_list.add_argument("--updated-since", help="Filter by updated_since timestamp")
     projects_list.set_defaults(func=handle_projects_list)
 
     projects_get = projects_sub.add_parser("get", help="Get a project by ID")
@@ -2430,14 +2127,10 @@ def build_parser() -> argparse.ArgumentParser:
     bt_del.set_defaults(func=handle_bank_transactions_delete)
 
     # Bank transaction explanations
-    bte = subparsers.add_parser(
-        "bank-transaction-explanations", help="Bank transaction explanation operations"
-    )
+    bte = subparsers.add_parser("bank-transaction-explanations", help="Bank transaction explanation operations")
     bte_sub = bte.add_subparsers(dest="action", required=True)
 
-    bte_list = bte_sub.add_parser(
-        "list", help="List bank transaction explanations (requires bank account)"
-    )
+    bte_list = bte_sub.add_parser("list", help="List bank transaction explanations (requires bank account)")
     bte_list.add_argument(
         "--bank-account",
         required=True,
@@ -2457,9 +2150,7 @@ def build_parser() -> argparse.ArgumentParser:
     bte_get.add_argument("id", help="Explanation ID")
     bte_get.set_defaults(func=handle_bank_transaction_explanations_get)
 
-    bte_create = bte_sub.add_parser(
-        "create", help="Create a bank transaction explanation from JSON body"
-    )
+    bte_create = bte_sub.add_parser("create", help="Create a bank transaction explanation from JSON body")
     bte_create.add_argument(
         "--body",
         required=True,
@@ -2472,23 +2163,17 @@ def build_parser() -> argparse.ArgumentParser:
     )
     bte_create.set_defaults(func=handle_bank_transaction_explanations_create)
 
-    bte_update = bte_sub.add_parser(
-        "update", help="Update a bank transaction explanation from JSON body"
-    )
+    bte_update = bte_sub.add_parser("update", help="Update a bank transaction explanation from JSON body")
     bte_update.add_argument("id", help="Explanation ID")
     bte_update.add_argument(
         "--body",
         required=True,
         help='JSON payload: {"bank_transaction_explanation": {...}}',
     )
-    bte_update.add_argument(
-        "--dry-run", action="store_true", help="Preview update without calling the API"
-    )
+    bte_update.add_argument("--dry-run", action="store_true", help="Preview update without calling the API")
     bte_update.set_defaults(func=handle_bank_transaction_explanations_update)
 
-    bte_delete = bte_sub.add_parser(
-        "delete", help="Delete a bank transaction explanation"
-    )
+    bte_delete = bte_sub.add_parser("delete", help="Delete a bank transaction explanation")
     bte_delete.add_argument("id", help="Explanation ID")
     bte_delete.add_argument(
         "--dry-run",
@@ -2513,17 +2198,13 @@ def build_parser() -> argparse.ArgumentParser:
     transactions = subparsers.add_parser("transactions", help="Accounting transactions")
     transactions_sub = transactions.add_subparsers(dest="action", required=True)
 
-    transactions_list = transactions_sub.add_parser(
-        "list", help="List accounting transactions"
-    )
+    transactions_list = transactions_sub.add_parser("list", help="List accounting transactions")
     transactions_list.add_argument("--from-date", help="Filter from date (YYYY-MM-DD)")
     transactions_list.add_argument("--to-date", help="Filter to date (YYYY-MM-DD)")
     transactions_list.add_argument("--nominal-code", help="Filter by nominal code")
     transactions_list.set_defaults(func=handle_transactions_list)
 
-    transactions_get = transactions_sub.add_parser(
-        "get", help="Get a single accounting transaction"
-    )
+    transactions_get = transactions_sub.add_parser("get", help="Get a single accounting transaction")
     transactions_get.add_argument("id", help="Transaction ID")
     transactions_get.set_defaults(func=handle_transactions_get)
 
@@ -2542,15 +2223,11 @@ def build_parser() -> argparse.ArgumentParser:
     js_get.add_argument("id", help="Journal set ID")
     js_get.set_defaults(func=handle_journal_sets_get)
 
-    js_opening = js_sub.add_parser(
-        "opening-balances", help="Get the opening balances journal set"
-    )
+    js_opening = js_sub.add_parser("opening-balances", help="Get the opening balances journal set")
     js_opening.set_defaults(func=handle_journal_sets_opening_balances)
 
     js_create = js_sub.add_parser("create", help="Create a journal set from JSON body")
-    js_create.add_argument(
-        "--body", required=True, help='JSON payload: {"journal_set": {...}}'
-    )
+    js_create.add_argument("--body", required=True, help='JSON payload: {"journal_set": {...}}')
     js_create.add_argument(
         "--dry-run",
         action="store_true",
@@ -2560,9 +2237,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     js_update = js_sub.add_parser("update", help="Update a journal set from JSON body")
     js_update.add_argument("id", help="Journal set ID")
-    js_update.add_argument(
-        "--body", required=True, help='JSON payload: {"journal_set": {...}}'
-    )
+    js_update.add_argument("--body", required=True, help='JSON payload: {"journal_set": {...}}')
     js_update.add_argument(
         "--dry-run",
         action="store_true",
@@ -2588,18 +2263,14 @@ def build_parser() -> argparse.ArgumentParser:
         "--attachable-type",
         help=("Filter by attachable type (e.g. Expense, BankTransactionExplanation)"),
     )
-    attachments_list.add_argument(
-        "--attachable-id", help="Filter by attachable ID (resource ID)"
-    )
+    attachments_list.add_argument("--attachable-id", help="Filter by attachable ID (resource ID)")
     attachments_list.set_defaults(func=handle_attachments_list)
 
     attachments_get = attachments_sub.add_parser("get", help="Get an attachment")
     attachments_get.add_argument("id", help="Attachment ID")
     attachments_get.set_defaults(func=handle_attachments_get)
 
-    attachments_upload = attachments_sub.add_parser(
-        "upload", help="Upload a new attachment"
-    )
+    attachments_upload = attachments_sub.add_parser("upload", help="Upload a new attachment")
     attachments_upload.add_argument("--file", required=True, help="Path to file")
     attachments_upload.add_argument("--description", help="Optional description")
     attachments_upload.add_argument(
@@ -2615,14 +2286,10 @@ def build_parser() -> argparse.ArgumentParser:
         "--file-name",
         help=("Override file name sent to FreeAgent " "(default: source file name)"),
     )
-    attachments_upload.add_argument(
-        "--dry-run", action="store_true", help="Preview upload without calling the API"
-    )
+    attachments_upload.add_argument("--dry-run", action="store_true", help="Preview upload without calling the API")
     attachments_upload.set_defaults(func=handle_attachments_upload)
 
-    attachments_delete = attachments_sub.add_parser(
-        "delete", help="Delete an attachment"
-    )
+    attachments_delete = attachments_sub.add_parser("delete", help="Delete an attachment")
     attachments_delete.add_argument("id", help="Attachment ID")
     attachments_delete.add_argument(
         "--dry-run",
@@ -2640,9 +2307,7 @@ def build_parser() -> argparse.ArgumentParser:
     bills_list.add_argument("--from-date")
     bills_list.add_argument("--to-date")
     bills_list.add_argument("--updated-since")
-    bills_list.add_argument(
-        "--nested-bill-items", action="store_true", help="Include nested bill items"
-    )
+    bills_list.add_argument("--nested-bill-items", action="store_true", help="Include nested bill items")
     bills_list.set_defaults(func=handle_bills_list)
 
     bills_list_all = bills_sub.add_parser("list-all", help="List all bills")
@@ -2653,17 +2318,13 @@ def build_parser() -> argparse.ArgumentParser:
     bills_get.set_defaults(func=handle_bills_get)
 
     bills_create = bills_sub.add_parser("create", help="Create a bill from JSON body")
-    bills_create.add_argument(
-        "--body", required=True, help='JSON payload: {"bill": {...}}'
-    )
+    bills_create.add_argument("--body", required=True, help='JSON payload: {"bill": {...}}')
     bills_create.add_argument("--dry-run", action="store_true")
     bills_create.set_defaults(func=handle_bills_create)
 
     bills_update = bills_sub.add_parser("update", help="Update a bill from JSON body")
     bills_update.add_argument("id", help="Bill ID")
-    bills_update.add_argument(
-        "--body", required=True, help='JSON payload: {"bill": {...}}'
-    )
+    bills_update.add_argument("--body", required=True, help='JSON payload: {"bill": {...}}')
     bills_update.add_argument("--dry-run", action="store_true")
     bills_update.set_defaults(func=handle_bills_update)
 
@@ -2695,17 +2356,13 @@ def build_parser() -> argparse.ArgumentParser:
     inv_get.set_defaults(func=handle_invoices_get)
 
     inv_create = inv_sub.add_parser("create", help="Create an invoice from JSON body")
-    inv_create.add_argument(
-        "--body", required=True, help='JSON payload: {"invoice": {...}}'
-    )
+    inv_create.add_argument("--body", required=True, help='JSON payload: {"invoice": {...}}')
     inv_create.add_argument("--dry-run", action="store_true")
     inv_create.set_defaults(func=handle_invoices_create)
 
     inv_update = inv_sub.add_parser("update", help="Update an invoice from JSON body")
     inv_update.add_argument("id", help="Invoice ID")
-    inv_update.add_argument(
-        "--body", required=True, help='JSON payload: {"invoice": {...}}'
-    )
+    inv_update.add_argument("--body", required=True, help='JSON payload: {"invoice": {...}}')
     inv_update.add_argument("--dry-run", action="store_true")
     inv_update.set_defaults(func=handle_invoices_update)
 
@@ -2749,9 +2406,7 @@ def build_parser() -> argparse.ArgumentParser:
     notes = subparsers.add_parser("notes", help="Note operations")
     notes_sub = notes.add_subparsers(dest="action", required=True)
 
-    notes_list = notes_sub.add_parser(
-        "list", help="List notes for a contact or project"
-    )
+    notes_list = notes_sub.add_parser("list", help="List notes for a contact or project")
     note_scope = notes_list.add_mutually_exclusive_group(required=True)
     note_scope.add_argument("--contact", help="Contact URL")
     note_scope.add_argument("--project", help="Project URL")
@@ -2761,15 +2416,11 @@ def build_parser() -> argparse.ArgumentParser:
     notes_get.add_argument("id", help="Note ID")
     notes_get.set_defaults(func=handle_notes_get)
 
-    notes_create = notes_sub.add_parser(
-        "create", help="Create a note for a contact or project"
-    )
+    notes_create = notes_sub.add_parser("create", help="Create a note for a contact or project")
     note_scope_create = notes_create.add_mutually_exclusive_group(required=True)
     note_scope_create.add_argument("--contact", help="Contact URL")
     note_scope_create.add_argument("--project", help="Project URL")
-    notes_create.add_argument(
-        "--body", required=True, help='JSON payload: {"note": {"note": "..."}}'
-    )
+    notes_create.add_argument("--body", required=True, help='JSON payload: {"note": {"note": "..."}}')
     notes_create.add_argument(
         "--dry-run",
         action="store_true",
@@ -2779,12 +2430,8 @@ def build_parser() -> argparse.ArgumentParser:
 
     notes_update = notes_sub.add_parser("update", help="Update a note")
     notes_update.add_argument("id", help="Note ID")
-    notes_update.add_argument(
-        "--body", required=True, help='JSON payload: {"note": {"note": "..."}}'
-    )
-    notes_update.add_argument(
-        "--dry-run", action="store_true", help="Preview update without calling the API"
-    )
+    notes_update.add_argument("--body", required=True, help='JSON payload: {"note": {"note": "..."}}')
+    notes_update.add_argument("--dry-run", action="store_true", help="Preview update without calling the API")
     notes_update.set_defaults(func=handle_notes_update)
 
     notes_delete = notes_sub.add_parser("delete", help="Delete a note")
@@ -2800,12 +2447,8 @@ def build_parser() -> argparse.ArgumentParser:
     sales_tax = subparsers.add_parser("sales-tax", help="Sales tax operations")
     st_sub = sales_tax.add_subparsers(dest="action", required=True)
 
-    st_moss = st_sub.add_parser(
-        "moss-rates", help="List EC MOSS sales tax rates for a country/date"
-    )
-    st_moss.add_argument(
-        "--country", required=True, help="EU country name (place_of_supply)"
-    )
+    st_moss = st_sub.add_parser("moss-rates", help="List EC MOSS sales tax rates for a country/date")
+    st_moss.add_argument("--country", required=True, help="EU country name (place_of_supply)")
     st_moss.add_argument("--date", required=True, help="Transaction date (YYYY-MM-DD)")
     st_moss.set_defaults(func=handle_sales_tax_moss_rates)
 

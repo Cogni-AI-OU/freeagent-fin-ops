@@ -86,11 +86,6 @@ You can add custom MCP servers for additional integrations.
 
 Follow the instructions in the agent's documentation to configure the necessary MCP servers.
 
-### Activation
-
-- Merge the agent configuration file into the default branch of your repository.
-- Access installed agents through the VS Code Chat interface, Copilot CLI, or assign them in CCA.
-
 ## Security Considerations
 
 ### Claude Code Agent Git Access
