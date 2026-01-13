@@ -60,14 +60,6 @@ molecule test
 molecule syntax
 ```
 
-```bash
-# Run tests if available
-python -m pytest tests/
-
-# Test CLI script manually
-./scripts/fa_cli.py --help
-```
-
 ### Adding or Modifying Workflows
 
 - Workflows in `.github/workflows/` can be reused via `workflow_call`
@@ -101,49 +93,31 @@ on top of the updated target branch:
 - **Always** verify with `git diff` that only your changes remain
 - **Use** `GIT_EDITOR=true` for non-interactive cherry-pick operations
 
-### Running the CLI
+### Using `report_progress` Tool
 
-```bash
-# Authenticate and cache tokens
-./scripts/fa_cli.py auth
+**WARNING**: The `report_progress` tool automatically rebases your branch against the remote
+tracking branch. This **WILL CRASH** the session if your local history has diverged from remote.
 
-# List bank accounts
-./scripts/fa_cli.py bank-accounts list
+**When Crash Occurs:**
 
-# List bank transactions
-./scripts/fa_cli.py bank-transactions list --bank-account <url>
+After using `git reset --hard` to rewrite history, your local branch diverges from remote. When `report_progress`
+tries to auto-rebase (e.g., 113 commits), it encounters conflicts it cannot resolve, crashing the session.
 
-# List bills
-./scripts/fa_cli.py bills list
+**Prevention (Choose One):**
 
-# List invoices
-./scripts/fa_cli.py invoices list
+1. **Use new branch name** after rewriting history: `git checkout -b <feature>-v2` (safest)
+2. **Complete git operations manually**, then ask user for manual push (never call `report_progress` after `git reset --hard`)
 
-# Get accounting reports
-./scripts/fa_cli.py reports balance-sheet
-./scripts/fa_cli.py reports profit-and-loss
-```
+**If Already Crashed:**
 
-### Environment Setup
+1. Run `git rebase --abort`
+2. Create new branch: `git checkout -b <feature>-v2`
+3. Push new branch: `git push origin <feature>-v2`
 
-```bash
-# Install dependencies
-pip install -r .devcontainer/requirements.txt
+**Error Patterns:** `Rebasing (1/XXX)` with large numbers, `CONFLICT (content)`, session crash with `GitError`
 
-# Install pre-commit hooks
-pre-commit install
-
-# Set up environment variables (copy from .env.example)
-cp .env.example .env
-# Edit .env with your FreeAgent OAuth credentials
-```
-
-## Configuration
-
-- **Environment Variables**: All configuration is via `FREEAGENT_*` environment variables
-- **OAuth2 Flow**: Uses authorization code flow with token refresh
-- **Output Formats**: Supports plain, csv, json, and yaml output formats
-- **Pagination**: Built-in pagination support with configurable page size
+**For complete details**, see:
+[`.github/skills/git/SKILL.md` - "Working with Automation Tools"](.github/skills/git/SKILL.md#working-with-automation-tools)
 
 ## References
 
@@ -174,11 +148,3 @@ If Copilot or automated checks behave unexpectedly:
 - Re-run `pre-commit run -a` locally to surface formatting or linting issues.
 - Verify `.markdownlint.yaml` and `.yamllint` have not been modified incorrectly.
 - If problems persist, open an issue with details of the command run and any error output.
-
-### Project-specific issues
-
-FreeAgent API Issues:
-
-- Check API rate limits (429 responses)
-- Verify OAuth tokens are valid (refresh on 401)
-- Ensure environment variables are set correctly
