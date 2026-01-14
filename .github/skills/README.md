@@ -12,16 +12,10 @@ Agent Skills work with:
 For more information, see
 [About Agent Skills](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills).
 
-## Skills in this repository
+## Skills catalog
 
-| Skill | Description |
-| ----- | ----------- |
-| [context-aware-ops](context-aware-ops/SKILL.md) | Intelligent resource management with size checking and filtering |
-| [git](git/SKILL.md) | Guide for using git with non-interactive, safe operations |
-| [github-actions](github-actions/SKILL.md) | Diagnosing and debugging failing GitHub Actions workflows |
-| [pre-commit](pre-commit/SKILL.md) | Guide for using pre-commit hooks to validate code formatting, linting, and security checks |
-| [robust-commands](robust-commands/SKILL.md) | Resilient command execution with automatic fallbacks and error recovery |
-| [skill-writer](skill-writer/SKILL.md) | Generate or update SKILL.md files for GitHub Copilot coding agents |
+The full, machine-readable list of skills lives in [AGENTS.md](AGENTS.md). Use it when you need the
+authoritative catalog for agent loading. This README stays human-focused.
 
 ## Creating skills
 
@@ -41,7 +35,7 @@ Instructions for Copilot to follow when this skill is activated.
 ### SKILL.md frontmatter
 
 | Field | Required | Description |
-| ----- | ----------- | ----------- |
+| ----- | -------- | ----------- |
 | `name` | Yes | Unique identifier (lowercase, hyphens for spaces) |
 | `description` | Yes | What the skill does and when to use it |
 | `license` | No | License that applies to this skill |
@@ -73,7 +67,7 @@ the skill's directory.
 
 Find and share skills with the community:
 
-- [anthropics/skills](https://github.com/anthropics/skills) — Reference skills
+- [anthropics/skills](https://github.com/anthropics/skills) - Reference skills
   repository
-- [github/awesome-copilot](https://github.com/github/awesome-copilot) — Community
+- [github/awesome-copilot](https://github.com/github/awesome-copilot) - Community
   collection of Copilot resources

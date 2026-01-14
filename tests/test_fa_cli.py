@@ -140,9 +140,7 @@ class BankTransactionExplanationsTests(unittest.TestCase):
         )
 
     @patch("scripts.fa_cli.paginate_get")
-    def test_bank_transaction_explanations_list_for_approval_filters(
-        self, paginate_get: Any
-    ) -> None:
+    def test_bank_transaction_explanations_list_for_approval_filters(self, paginate_get: Any) -> None:
         paginate_get.return_value = [
             {"url": "u1", "marked_for_review": True},
             {"url": "u2", "marked_for_review": False},
@@ -195,16 +193,12 @@ class BankTransactionExplanationsTests(unittest.TestCase):
         payload = json.loads(buf.getvalue())
 
         self.assertEqual(payload[0]["description"], "Invoice payment")
-        api_request_mock.assert_called_once_with(
-            "GET", config, store, "/bank_transaction_explanations/2"
-        )
+        api_request_mock.assert_called_once_with("GET", config, store, "/bank_transaction_explanations/2")
 
     @patch("scripts.fa_cli.api_request")
     def test_bank_transaction_explanations_create(self, api_request_mock: Any) -> None:
         api_request_mock.return_value.json.return_value = {
-            "bank_transaction_explanation": {
-                "url": "https://api.example.com/bank_transaction_explanations/3"
-            }
+            "bank_transaction_explanation": {"url": "https://api.example.com/bank_transaction_explanations/3"}
         }
         args = argparse.Namespace(
             body=json.dumps(
@@ -240,9 +234,7 @@ class BankTransactionExplanationsTests(unittest.TestCase):
         )
 
     @patch("scripts.fa_cli.api_request")
-    def test_bank_transaction_explanations_update_dry_run(
-        self, api_request_mock: Any
-    ) -> None:
+    def test_bank_transaction_explanations_update_dry_run(self, api_request_mock: Any) -> None:
         args = argparse.Namespace(
             id="4",
             body=json.dumps(
@@ -269,9 +261,7 @@ class BankTransactionExplanationsTests(unittest.TestCase):
         api_request_mock.assert_not_called()
 
     @patch("scripts.fa_cli.api_request")
-    def test_bank_transaction_explanations_delete_dry_run(
-        self, api_request_mock: Any
-    ) -> None:
+    def test_bank_transaction_explanations_delete_dry_run(self, api_request_mock: Any) -> None:
         args = argparse.Namespace(id="5", dry_run=True)
         config = fa_cli.AppConfig(
             oauth_id="id",
@@ -284,9 +274,7 @@ class BankTransactionExplanationsTests(unittest.TestCase):
         with redirect_stdout(buf):
             fa_cli.handle_bank_transaction_explanations_delete(args, config, store)
 
-        self.assertIn(
-            "[dry-run] Would delete bank transaction explanation 5", buf.getvalue()
-        )
+        self.assertIn("[dry-run] Would delete bank transaction explanation 5", buf.getvalue())
         api_request_mock.assert_not_called()
 
     @patch("scripts.fa_cli.api_request")
@@ -415,9 +403,7 @@ class ContactsGetTests(unittest.TestCase):
 class ContactsUpdateTests(unittest.TestCase):
     @patch("scripts.fa_cli.api_request")
     def test_contacts_update(self, api_request_mock: Any) -> None:
-        api_request_mock.return_value.json.return_value = {
-            "contact": {"url": "https://api.example.com/contacts/1"}
-        }
+        api_request_mock.return_value.json.return_value = {"contact": {"url": "https://api.example.com/contacts/1"}}
         args = argparse.Namespace(
             id="1",
             body=json.dumps(
@@ -452,9 +438,7 @@ class ContactsUpdateTests(unittest.TestCase):
     def test_contacts_update_dry_run(self) -> None:
         args = argparse.Namespace(
             id="1",
-            body=json.dumps(
-                {"contact": {"address1": "6 High Street", "postcode": "E15 2GR"}}
-            ),
+            body=json.dumps({"contact": {"address1": "6 High Street", "postcode": "E15 2GR"}}),
             dry_run=True,
         )
         config = fa_cli.AppConfig(
@@ -666,9 +650,7 @@ class PayrollPayslipsTests(unittest.TestCase):
         output = json.loads(buf.getvalue())
 
         self.assertEqual(output[0]["tax_code"], "1100L")
-        api_request_mock.assert_called_once_with(
-            "GET", config, store, "/payroll/2026/0"
-        )
+        api_request_mock.assert_called_once_with("GET", config, store, "/payroll/2026/0")
 
 
 class CompanyInfoTests(unittest.TestCase):
@@ -730,9 +712,7 @@ class CompanyBusinessCategoriesTests(unittest.TestCase):
 
         self.assertEqual(payload[0]["business_category"], "Accounting")
         self.assertEqual(payload[1]["business_category"], "Software Development")
-        api_request_mock.assert_called_once_with(
-            "GET", config, store, "/company/business_categories"
-        )
+        api_request_mock.assert_called_once_with("GET", config, store, "/company/business_categories")
 
 
 class CompanyTaxTimelineTests(unittest.TestCase):
@@ -763,9 +743,7 @@ class CompanyTaxTimelineTests(unittest.TestCase):
         payload = json.loads(buf.getvalue())
 
         self.assertEqual(payload[0]["description"], "VAT Return 09 11")
-        api_request_mock.assert_called_once_with(
-            "GET", config, store, "/company/tax_timeline"
-        )
+        api_request_mock.assert_called_once_with("GET", config, store, "/company/tax_timeline")
 
 
 class ReportsProfitLossTests(unittest.TestCase):
@@ -897,9 +875,7 @@ class TransactionsGetTests(unittest.TestCase):
         payload = json.loads(buf.getvalue())
 
         self.assertEqual(payload[0]["nominal_code"], "359")
-        api_request_mock.assert_called_once_with(
-            "GET", config, store, "/accounting/transactions/2"
-        )
+        api_request_mock.assert_called_once_with("GET", config, store, "/accounting/transactions/2")
 
 
 class JournalSetsTests(unittest.TestCase):
@@ -975,9 +951,7 @@ class JournalSetsTests(unittest.TestCase):
         payload = json.loads(buf.getvalue())
 
         self.assertEqual(payload[0]["description"], "Opening balances")
-        api_request_mock.assert_called_once_with(
-            "GET", config, store, "/journal_sets/2"
-        )
+        api_request_mock.assert_called_once_with("GET", config, store, "/journal_sets/2")
 
     @patch("scripts.fa_cli.api_request")
     def test_journal_sets_opening_balances(self, api_request_mock: Any) -> None:
@@ -1001,9 +975,7 @@ class JournalSetsTests(unittest.TestCase):
         payload = json.loads(buf.getvalue())
 
         self.assertEqual(payload[0]["description"], "Opening Balances Journal Set")
-        api_request_mock.assert_called_once_with(
-            "GET", config, store, "/journal_sets/opening_balances"
-        )
+        api_request_mock.assert_called_once_with("GET", config, store, "/journal_sets/opening_balances")
 
     @patch("scripts.fa_cli.api_request")
     def test_journal_sets_create(self, api_request_mock: Any) -> None:
@@ -1213,9 +1185,7 @@ class AttachmentsDeleteTests(unittest.TestCase):
         output = buf.getvalue().strip()
 
         self.assertIn("Deleted attachment 4", output)
-        api_request_mock.assert_called_once_with(
-            "DELETE", config, store, "/attachments/4"
-        )
+        api_request_mock.assert_called_once_with("DELETE", config, store, "/attachments/4")
 
 
 class UsersListTests(unittest.TestCase):
@@ -1234,9 +1204,7 @@ class UsersListTests(unittest.TestCase):
                 "updated_at": "2024-01-02T00:00:00Z",
             }
         ]
-        args = argparse.Namespace(
-            view="staff", per_page=10, page=1, format="json", max_pages=None
-        )
+        args = argparse.Namespace(view="staff", per_page=10, page=1, format="json", max_pages=None)
         config = fa_cli.AppConfig(
             oauth_id="id",
             oauth_secret=TEST_OAUTH_SECRET,
@@ -1357,9 +1325,7 @@ class UsersDeleteTests(unittest.TestCase):
 class UsersSetPermissionTests(unittest.TestCase):
     @patch("scripts.fa_cli.api_request")
     def test_users_set_permission(self, api_request_mock: Any) -> None:
-        api_request_mock.return_value.json.return_value = {
-            "user": {"permission_level": 0}
-        }
+        api_request_mock.return_value.json.return_value = {"user": {"permission_level": 0}}
         args = argparse.Namespace(id="123", permission_level=0, dry_run=False)
         config = fa_cli.AppConfig(
             oauth_id="id",
@@ -1402,9 +1368,7 @@ class UsersSetPermissionTests(unittest.TestCase):
 class UsersGetPermissionTests(unittest.TestCase):
     @patch("scripts.fa_cli.api_request")
     def test_users_get_permission(self, api_request_mock: Any) -> None:
-        api_request_mock.return_value.json.return_value = {
-            "user": {"permission_level": 5}
-        }
+        api_request_mock.return_value.json.return_value = {"user": {"permission_level": 5}}
         args = argparse.Namespace(id="123")
         config = fa_cli.AppConfig(
             oauth_id="id",
@@ -1538,9 +1502,7 @@ class TimeslipsDeleteTests(unittest.TestCase):
         output = buf.getvalue().strip()
 
         self.assertIn("Deleted timeslip 25", output)
-        api_request_mock.assert_called_once_with(
-            "DELETE", config, store, "/timeslips/25"
-        )
+        api_request_mock.assert_called_once_with("DELETE", config, store, "/timeslips/25")
 
     @patch("scripts.fa_cli.api_request")
     def test_timeslips_delete_dry_run(self, api_request_mock: Any) -> None:
@@ -1627,9 +1589,7 @@ class FinalAccountsGetTests(unittest.TestCase):
         payload = json.loads(buf.getvalue())
 
         self.assertEqual(payload[0]["period_ends_on"], "2023-12-31")
-        api_request_mock.assert_called_once_with(
-            "GET", config, store, "/final_accounts_reports/2023-12-31"
-        )
+        api_request_mock.assert_called_once_with("GET", config, store, "/final_accounts_reports/2023-12-31")
 
 
 class FinalAccountsMarkFiledTests(unittest.TestCase):
@@ -1654,9 +1614,7 @@ class FinalAccountsMarkFiledTests(unittest.TestCase):
             fa_cli.handle_final_accounts_mark_as_filed(args, config, store)
         output = json.loads(buf.getvalue())
 
-        self.assertEqual(
-            output["final_accounts_report"]["filing_status"], "marked_as_filed"
-        )
+        self.assertEqual(output["final_accounts_report"]["filing_status"], "marked_as_filed")
         api_request_mock.assert_called_once_with(
             "PUT", config, store, "/final_accounts_reports/2023-12-31/mark_as_filed"
         )

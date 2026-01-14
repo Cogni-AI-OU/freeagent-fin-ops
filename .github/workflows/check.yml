@@ -8,6 +8,9 @@ on:
   schedule:
     - cron: 0 0 * * 1  # Run every Monday at 00:00 UTC
   workflow_call:
+  workflow_dispatch:
+permissions:
+  contents: read
 jobs:
   check:
     # See: https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows

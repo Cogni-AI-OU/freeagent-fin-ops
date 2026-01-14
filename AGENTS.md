@@ -1,22 +1,25 @@
 # AGENTS.md
 
-Guidance for automation agents working in this repository.
+Guidance for coding agents working in this repository.
 
-## Quick Start
+For general project guidance, see [README.md](README.md).
 
-- See [README.md](README.md) for setup and installation instructions
-- This is a Python 3.11+ project using `uv` for script execution
-- OAuth2-enabled FreeAgent API client for bank accounts, transactions, bills, invoices, and reports
+## Required References
 
-## Instructions
+- Project overview and install steps: [README.md](README.md)
+- Agent configuration and conventions: [.github/copilot-instructions.md](.github/copilot-instructions.md)
+- Language and format rules: see [.github/instructions/AGENTS.md](.github/instructions/AGENTS.md)
+- Workflow and navigation help: [.tours/getting-started.tour](.tours/getting-started.tour)
+- For enhanced agent capabilities, see [Copilot Plus](.github/agents/copilot-plus.agent.md)
 
-For detailed coding standards and formatting guidelines, refer to:
+## Agent Catalogs
 
-- [Copilot Instructions](.github/copilot-instructions.md) - Main coding standards
-- [Ansible](.github/instructions/ansible.instructions.md) - Ansible conventions
-- [JSON](.github/instructions/json.instructions.md) - JSON formatting standards
-- [Markdown](.github/instructions/markdown.instructions.md) - Markdown standards
-- [YAML](.github/instructions/yaml.instructions.md) - YAML formatting standards
+Use these catalogs for authoritative, machine-readable lists of resources:
+
+- Skills: [.github/skills/AGENTS.md](.github/skills/AGENTS.md) - loadable skills and their SKILL.md entries
+- Instructions: [.github/instructions/AGENTS.md](.github/instructions/AGENTS.md) - formatting and language rules
+- Workflows: [.github/workflows/AGENTS.md](.github/workflows/AGENTS.md) - reusable GitHub Actions with inputs/triggers
+- Prompts: [.github/prompts/AGENTS.md](.github/prompts/AGENTS.md) - available prompt files
 
 ### Specialized Agents
 
@@ -27,13 +30,11 @@ For specific tasks, use the following specialized agent instructions:
 
 ## Common Tasks
 
-### Before the changes
+### Before each commit
 
-Before each commit change:
-
-- Verify your expected changes by `git diff --no-color`.
-- Use linting and validation tools used by project to confirm your changes meet the coding standard.
-- If repo uses git hooks, run them to validate your changes.
+- Verify your expected changes with `git diff --no-color`.
+- Use the project linting/validation tools to confirm your changes meet the coding standard.
+- If the repo uses git hooks, run them to validate your changes.
 
 ### Linting and Validation
 
@@ -46,11 +47,11 @@ pre-commit run markdownlint -a
 pre-commit run yamllint -a
 ```
 
-### Understanding the task
+### Understanding the Task
 
-- When task is not clear, check further relevant information for better clarity.
-- If triggered by a short comment, check if parent's comment exist and consist further information.
-- If none of above helps, and task is ambiguous, comminicate to the user with potential options.
+- When the task is not clear, look for additional context.
+- If triggered by a brief comment, check whether the parent comment exists and includes more detail.
+- If it's still ambiguous, communicate with the user and propose options.
 
 ### Testing
 
@@ -86,7 +87,7 @@ on top of the updated target branch:
 5. Verify only your changes remain
 
 **For detailed step-by-step instructions with commands**, see:
-[`.github/skills/git/SKILL.md` - "Integrating Changes from Target Branch"](.github/skills/git/SKILL.md#integrating-changes-from-target-branch-avoiding-merge-commits)
+[`.github/skills/git/SKILL.md`](.github/skills/git/SKILL.md)
 
 ### Key Points
 
@@ -95,70 +96,31 @@ on top of the updated target branch:
 - **Always** verify with `git diff` that only your changes remain
 - **Use** `GIT_EDITOR=true` for non-interactive cherry-pick operations
 
+### Using `report_progress` Tool
 
-### Running the CLI
+**WARNING**: The `report_progress` tool automatically rebases your branch against the remote
+tracking branch. This **WILL CRASH** the session if your local history has diverged from remote.
 
-```bash
-# Authenticate and cache tokens
-./scripts/fa_cli.py auth
+**When Crash Occurs:**
 
-# List bank accounts
-./scripts/fa_cli.py bank-accounts list
+After using `git reset --hard` to rewrite history, your local branch diverges from remote. When `report_progress`
+tries to auto-rebase (e.g., 113 commits), it encounters conflicts it cannot resolve, crashing the session.
 
-# List bank transactions
-./scripts/fa_cli.py bank-transactions list --bank-account <url>
+**Prevention (Choose One):**
 
-# List bills
-./scripts/fa_cli.py bills list
+1. **Use new branch name** after rewriting history: `git checkout -b <feature>-v2` (safest)
+2. **Complete git operations manually**, then ask user for manual push (never call `report_progress` after `git reset --hard`)
 
-# List invoices
-./scripts/fa_cli.py invoices list
+**If Already Crashed:**
 
-# Get accounting reports
-./scripts/fa_cli.py reports balance-sheet
-./scripts/fa_cli.py reports profit-and-loss
-```
+1. Run `git rebase --abort`
+2. Create new branch: `git checkout -b <feature>-v2`
+3. Push new branch: `git push origin <feature>-v2`
 
-### Testing
+**Error Patterns:** `Rebasing (1/XXX)` with large numbers, `CONFLICT (content)`, session crash with `GitError`
 
-```bash
-# Run tests if available
-python -m pytest tests/
-
-# Test CLI script manually
-./scripts/fa_cli.py --help
-```
-
-### Environment Setup
-
-```bash
-# Install dependencies
-pip install -r .devcontainer/requirements.txt
-
-# Install pre-commit hooks
-pre-commit install
-
-# Set up environment variables (copy from .env.example)
-cp .env.example .env
-# Edit .env with your FreeAgent OAuth credentials
-```
-
-## Configuration
-
-- **Environment Variables**: All configuration is via `FREEAGENT_*` environment variables
-- **OAuth2 Flow**: Uses authorization code flow with token refresh
-- **Output Formats**: Supports plain, csv, json, and yaml output formats
-- **Pagination**: Built-in pagination support with configurable page size
-
-## Project Structure
-
-- `.devcontainer/`: Development container configuration
-- `.github/`: GitHub workflows and instructions
-- `docs/`: How-to guides and documentation
-- `scripts/`: CLI scripts (main: `fa_cli.py`)
-- `tests/`: Test files
-- `.env.example`: Example environment configuration
-
+**For complete details**, see:
+[`.github/skills/git/SKILL.md` - "Working with Automation Tools"](.github/skills/git/SKILL.md#working-with-automation-tools)
 
 ## References
 
@@ -189,9 +151,3 @@ If Copilot or automated checks behave unexpectedly:
 - Re-run `pre-commit run -a` locally to surface formatting or linting issues.
 - Verify `.markdownlint.yaml` and `.yamllint` have not been modified incorrectly.
 - If problems persist, open an issue with details of the command run and any error output.
-
-### FreeAgent API Issues
-
-- Check API rate limits (429 responses)
-- Verify OAuth tokens are valid (refresh on 401)
-- Ensure environment variables are set correctly

@@ -20,6 +20,12 @@ on:
     types:
       - submitted
   workflow_call:
+permissions:
+  actions: read
+  contents: write
+  id-token: write
+  issues: write
+  pull-requests: write
 jobs:
   claude:
     # See: https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows
