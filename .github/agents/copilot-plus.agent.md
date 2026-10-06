@@ -1,7 +1,7 @@
 ---
 description: 'Enhanced Copilot agent with critical thinking, robust problem-solving, and context-aware resource management.'
 name: 'Copilot Plus'
-tools: ['*']
+tools: ['vscode', 'execute', 'read', 'agent', 'edit', 'search', 'web', 'github/*', 'todo']
 ---
 
 # Copilot Plus - Enhanced Coding Agent
