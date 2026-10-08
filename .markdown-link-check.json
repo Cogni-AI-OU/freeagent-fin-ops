@@ -1,5 +1,5 @@
 {
-  "aliveStatusCodes": [200, 206, 403],
+  "aliveStatusCodes": [200, 206, 403, 429],
   "ignorePatterns": [
     {
       "pattern": "^http://localhost"
@@ -23,6 +23,7 @@
       "pattern": "^https://github.com/org/repo"
     }
   ],
+  "fallbackRetryDelay": "2m",
   "retryCount": 3,
   "retryOn429": true,
   "timeout": "10s"
